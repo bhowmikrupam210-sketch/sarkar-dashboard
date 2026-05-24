@@ -1,0 +1,53 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch: # This allows you to trigger the build manually
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: Prepare Web Folder
+        run: |
+          # Create the folder Capacitor expects
+          mkdir -p www
+          # Move your HTML file into the folder safely
+          mv *.html www/ || true
+          mv *.js www/ || true
+          mv *.css www/ || true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Java (For Android Build)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Capacitor & Setup Android
+        run: |
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          # Initialize app with Name: SarkarApp and Package ID: com.sarkar.app
+          npx cap init SarkarApp com.sarkar.app --web-dir www
+          npx cap add android
+
+      - name: Compile APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload Final APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SarkarApp-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          
