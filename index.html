@@ -1,0 +1,2085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sarkar Enterprises Premium Dashboard</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lato:wght@600&display=swap" rel="stylesheet">
+    
+    <script>
+        const isLoggedIn = localStorage.getItem('sarkar_isLoggedIn') === 'true';
+        if (isLoggedIn) {
+            document.documentElement.style.setProperty('--login-display', 'none');
+        } else {
+            document.documentElement.style.setProperty('--login-display', 'flex');
+        }
+    </script>
+    <style>
+        html { font-size: clamp(13px, 3.5vw, 16px); }
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; max-width: 100vw; }
+        body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background-color: #f4f7fa; overflow-x: hidden; overflow-y: hidden; height: 100vh; height: 100dvh; display: flex; flex-direction: column; position: fixed; width: 100%; }
+        .header-container { background-color: #ffffff; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E2E8F0; position: sticky; top: 0; z-index: 1000; }
+        .brand-wrapper { display: flex; align-items: center; gap: 8px; cursor: pointer; flex: 1; min-width: 0; }
+        .scrap-icon-text { color: #10B981; font-size: clamp(24px, 6.5vw, 28px); flex-shrink: 0; line-height: 1; text-align: center; vertical-align: middle; font-family: inherit; }
+        .text-stack { display: flex; flex-direction: column; justify-content: center; flex: 1; min-width: 0; }
+        .brand-title { color: #0A1128; font-size: clamp(16.5px, 4.8vw, 21px); font-weight: 700; margin: 0; line-height: 1.1; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .brand-subtitle { color: #64748B; font-family: 'Lato', sans-serif !important; font-size: clamp(10.5px, 3.2vw, 14px); font-weight: 600; margin: 2px 0 0 0; line-height: 1; letter-spacing: 1px; text-transform: lowercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .basket-btn { width: 44px; height: 44px; border-radius: 12px; border: 1px solid #E2E8F0; background-color: #F8FAFC; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: all 0.2s ease; flex-shrink: 0; }
+        .basket-btn:active { transform: scale(0.95); }
+        .basket-btn-settings svg { stroke: #64748B; }
+        .basket-btn-logout { background-color: #FEF2F2; border-color: #FECACA; }
+        .basket-btn-logout svg { stroke: #EF4444; }
+        .premium-toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: #0A1128; color: #ffffff; padding: 14px 24px; border-radius: 30px; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 500; box-shadow: 0 10px 30px rgba(0,0,0,0.25); z-index: 99999; display: flex; align-items: center; gap: 10px; transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); width: max-content; max-width: 90%; }
+        .premium-toast.show { top: 40px; }
+        .premium-toast.error { background: #EF4444; }
+        .login-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #10B981 0%, #047857 100%); z-index: 9999; display: var(--login-display); align-items: center; justify-content: center; transition: opacity 0.4s ease; font-family: 'Poppins', sans-serif; }
+        .login-card { background: #ffffff; border-radius: 24px; padding: 36px 24px; width: 85%; max-width: 360px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 20px; text-align: center; }
+        .login-header { margin-bottom: 8px; }
+        .login-icon { font-size: 52px; margin-bottom: 12px; display: block; }
+        .login-title { font-size: 24px; font-weight: 700; color: #0A1128; margin: 0; letter-spacing: -0.5px; }
+        .login-subtitle { font-size: 13px; color: #64748B; margin: 4px 0 0 0; }
+        .login-input-group { display: flex; flex-direction: column; gap: 16px; text-align: left; }
+        .login-input-wrapper { position: relative; display: flex; align-items: center; }
+        .login-input-wrapper svg.input-icon { position: absolute; left: 14px; width: 20px; height: 20px; stroke: #94A3B8; fill: none; stroke-width: 2; }
+        .password-toggle { position: absolute; right: 14px; width: 20px; height: 20px; stroke: #64748B; fill: none; stroke-width: 2; cursor: pointer; z-index: 2; }
+        .login-input { width: 100%; padding: 14px 44px 14px 44px; border-radius: 12px; border: 1px solid #CBD5E1; font-family: 'Poppins', sans-serif; font-size: 14px; color: #0A1128; outline: none; transition: all 0.2s ease; background: #F8FAFC; }
+        .login-input:focus { border-color: #10B981; background: #ffffff; box-shadow: 0 0 0 3px rgba(16,185,129,0.1); }
+        .login-btn { background: #0A1128; color: #ffffff; border: none; padding: 16px; border-radius: 14px; font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; box-shadow: 0 8px 16px rgba(10,17,40,0.2); transition: transform 0.2s ease, box-shadow 0.2s ease; margin-top: 8px; }
+        .login-btn:active { transform: scale(0.98); }
+        .login-error { color: #EF4444; font-size: 12px; font-weight: 500; margin-top: -8px; display: none; }
+        .dashboard-wrapper { padding: clamp(10px, 2vh, 16px) 16px 75px 16px; background-color: #F4F7FA; flex: 1; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; font-family: 'Poppins', sans-serif; overscroll-behavior-y: contain; position: relative; display: flex; flex-direction: column; }
+        .dashboard-wrapper::-webkit-scrollbar { display: none; }
+        .view-section { display: none; flex-direction: column; flex: 1; }
+        .view-section.active { display: flex; }
+        #section-home { flex: 1; min-height: 0; justify-content: space-between; overflow: hidden; }
+        .settings-section { background: #ffffff; border-radius: 16px; border: 1px solid #E2E8F0; padding: 16px; margin-bottom: 20px; }
+        .settings-title { font-size: 14px; font-weight: 700; color: #0A1128; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .settings-item { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid #F1F5F9; cursor: pointer; transition: background 0.2s; }
+        .settings-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .settings-item:first-of-type { padding-top: 0; }
+        .settings-item-left { display: flex; align-items: center; gap: 12px; }
+        .settings-item-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: #F8FAFC; color: #64748B; }
+        .settings-item-text h4 { margin: 0; font-size: 15px; font-weight: 600; color: #0F172A; }
+        .settings-item-text p { margin: 2px 0 0 0; font-size: 12px; color: #64748B; }
+        .settings-danger .settings-item-icon { background: #FEF2F2; color: #EF4444; }
+        .settings-danger .settings-item-text h4 { color: #EF4444; }
+        .pull-to-refresh-loader { height: 0px; width: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; transition: height 0.2s cubic-bezier(0.4, 0, 0.2, 1); background: transparent; flex-shrink: 0; }
+        .pull-to-refresh-loader.dragging { transition: none; }
+        .ptr-spinner { width: 26px; height: 26px; border: 3px solid #10B981; border-top-color: transparent; border-radius: 50%; opacity: 0; transform: rotate(0deg); transition: opacity 0.2s; }
+        .pull-to-refresh-loader.ready .ptr-spinner { opacity: 1; }
+        .pull-to-refresh-loader.refreshing .ptr-spinner { opacity: 1; animation: ptr-spin 0.8s linear infinite; }
+        @keyframes ptr-spin { 100% { transform: rotate(360deg); } }
+        .analytics-section-top { margin-bottom: clamp(8px, 1.5vh, 16px); display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start; flex-wrap: nowrap; gap: 12px; flex-shrink: 0; }
+        .greeting-box { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+        .greeting-message { font-size: 18px; font-weight: 500; color: #334155; margin: 0; letter-spacing: 0px; display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .name-highlight { color: #10B981; font-weight: 600; }
+        .greeting-subtext { font-size: 12px; color: #94A3B8; font-weight: 400; margin: 0; letter-spacing: 0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        @keyframes waveHand { 0% { transform: rotate(0.0deg) } 10% { transform: rotate(14.0deg) } 20% { transform: rotate(-8.0deg) } 30% { transform: rotate(14.0deg) } 40% { transform: rotate(-4.0deg) } 50% { transform: rotate(10.0deg) } 60% { transform: rotate(0.0deg) } 100% { transform: rotate(0.0deg) } }
+        .waving-hand { display: inline-block; transform-origin: 70% 70%; animation: waveHand 2.5s infinite; }
+        .custom-dropdown-wrapper { position: relative; display: inline-block; width: max-content; flex-shrink: 0; }
+        .sort-btn { background-color: #ffffff; border: 1px solid #10B981; border-radius: 20px; padding: 6px 12px; font-family: 'Poppins', sans-serif; font-size: 12.5px; font-weight: 500; color: #10B981; cursor: pointer; outline: none; display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.05); transition: all 0.2s ease; width: 95px; flex-shrink: 0; }
+        .sort-btn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; flex: 1; text-align: left; }
+        .sort-btn:active { transform: scale(0.98); }
+        .sort-btn svg { width: 14px; height: 14px; stroke: #10B981; transition: transform 0.2s ease; flex-shrink: 0; }
+        .sort-btn.active svg { transform: rotate(180deg); }
+        .custom-menu { position: absolute; top: calc(100% + 8px); right: 0; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); min-width: 200px; z-index: 100; display: none; flex-direction: column; padding: 8px 0; }
+        .custom-menu.show { display: flex; }
+        .dropdown-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; cursor: pointer; transition: background-color 0.1s ease; }
+        .dropdown-item:active { background-color: #F8FAFC; }
+        .dropdown-item span.item-text { font-size: 12.5px; color: #334155; font-weight: 400; }
+        .dropdown-item input[type="radio"] { display: none; }
+        .custom-radio { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid #CBD5E1; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+        .dropdown-item input[type="radio"]:checked + .custom-radio { border-color: #10B981; }
+        .dropdown-item input[type="radio"]:checked + .custom-radio::after { content: ''; width: 8px; height: 8px; background-color: #10B981; border-radius: 50%; }
+        .hero-card { background: linear-gradient(135deg, #10B981 0%, #34D399 100%); border-radius: 24px; padding: clamp(14px, 2vh, 20px) 24px; color: white; position: relative; overflow: hidden; box-shadow: 0 16px 32px rgba(16, 185, 129, 0.2); margin-bottom: clamp(8px, 1.5vh, 16px); min-height: 90px; flex-shrink: 0; }
+        .hero-title { font-size: 14px; font-weight: 500; opacity: 0.9; margin-bottom: 6px; }
+        .hero-value { font-size: clamp(26px, 5vh, 34px); font-weight: 600; margin-bottom: clamp(8px, 1.5vh, 16px); letter-spacing: -0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .hero-badge { display: inline-flex; align-items: center; background-color: rgba(255, 255, 255, 0.25); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; backdrop-filter: blur(8px); position: relative; z-index: 2; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        @keyframes waveMotion { 0% { transform: translateX(0) scaleY(1); } 50% { transform: translateX(-15%) scaleY(1.05); } 100% { transform: translateX(0) scaleY(1); } }
+        .hero-wave { position: absolute; bottom: 0; left: 0; width: 150%; height: 55%; pointer-events: none; transform-origin: bottom; animation: waveMotion 6s ease-in-out infinite; }
+        .stats-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: 1fr 1fr; gap: clamp(8px, 1.5vh, 16px); flex-grow: 1; min-height: 0; }
+        .premium-card { background-color: #ffffff; border-radius: 22px; padding: clamp(10px, 2vh, 16px); box-shadow: 0 8px 24px rgba(149, 157, 165, 0.08); border: 1px solid #10B981; display: flex; flex-direction: column; justify-content: space-between; gap: clamp(4px, 1vh, 8px); height: 100%; min-height: 0; }
+        .pc-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .pc-label { font-size: 12.5px; font-weight: 500; color: #64748B; line-height: 1.3; }
+        .pc-icon { width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .pc-icon svg { width: 18px; height: 18px; stroke-width: 2.2; }
+        .icon-blue { background-color: #EFF6FF; stroke: #3B82F6; }
+        .icon-green { background-color: #ECFDF5; stroke: #10B981; }
+        .icon-orange { background-color: #ECFDF5; stroke: #10B981; } 
+        .icon-purple { background-color: #F5F3FF; stroke: #8B5CF6; }
+        .pc-value { font-size: clamp(18px, 3vh, 22px); font-weight: 600; color: #0F172A; letter-spacing: -0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .pc-footer { display: flex; align-items: center; gap: 4px; width: 100%; white-space: nowrap; overflow: hidden; }
+        .pc-trend { display: inline-flex; align-items: center; gap: 2px; padding: 4px 6px; border-radius: 20px; font-size: 10.5px; font-weight: 600; flex-shrink: 0; }
+        .trend-up { background-color: #D1FAE5; color: #059669; }
+        .trend-neutral { background-color: #F1F5F9; color: #64748B; }
+        .trend-down { background-color: #FEE2E2; color: #DC2626; } 
+        .pc-subtitle { font-size: 10.5px; font-weight: 500; color: #94A3B8; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .page-header-wrapper { background-color: #ffffff; border-radius: 20px; padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 14px; box-shadow: 0 8px 24px rgba(149, 157, 165, 0.08); border: 1px solid #E2E8F0; }
+        .page-header-icon { width: 44px; height: 44px; background-color: #ECFDF5; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .page-header-icon svg { width: 22px; height: 22px; stroke: #10B981; stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        .page-header-text { display: flex; flex-direction: column; gap: 2px; }
+        .page-header-title { font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 700; color: #0A1128; margin: 0; letter-spacing: -0.2px; line-height: 1.2; }
+        .page-header-subtitle { font-family: 'Lato', sans-serif; font-size: 12px; color: #64748B; font-weight: 500; margin: 0; letter-spacing: 0.3px; }
+        .trade-banners-container { display: flex; flex-direction: column; gap: 20px; }
+        .trade-banner { position: relative; border-radius: 28px; padding: 36px 28px; min-height: 120px; display: flex; justify-content: space-between; align-items: center; overflow: hidden; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.15); transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s; }
+        .trade-banner::after { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255, 255, 255, 0.3); border-radius: 50%; transform: translate(-50%, -50%); opacity: 0; transition: width 0.4s ease-out, height 0.4s ease-out, opacity 0.4s ease-out; }
+        .trade-banner:active { transform: scale(0.96); }
+        .trade-banner:active::after { width: 400px; height: 400px; opacity: 1; transition: 0s; }
+        .banner-purchase { background: linear-gradient(135deg, #FF7B22 0%, #9A3412 100%); box-shadow: 0 16px 32px rgba(255, 123, 34, 0.25); }
+        .banner-dispatch { background: linear-gradient(135deg, #10B981 0%, #047857 100%); box-shadow: 0 16px 32px rgba(16, 185, 129, 0.25); }
+        .bg-shape { position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.06); z-index: 1; }
+        .bg-shape-1 { width: 180px; height: 180px; top: -40px; right: -20px; }
+        .bg-shape-2 { width: 120px; height: 120px; bottom: -30px; left: -20px; }
+        .bg-icon { position: absolute; opacity: 0.15; fill: #ffffff; z-index: 1; }
+        .bg-icon-1 { top: 15px; right: 60px; width: 100px; height: 100px; transform: rotate(10deg); }
+        .tb-content { z-index: 2; display: flex; flex-direction: column; gap: 4px; }
+        .tb-title { color: #ffffff; font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 600; margin: 0; letter-spacing: 0px; line-height: 1.2; }
+        .tb-subtitle { color: rgba(255, 255, 255, 0.9); font-family: 'Lato', sans-serif; font-size: 13px; font-weight: 500; margin: 0; letter-spacing: 0.3px; }
+        .tb-action { z-index: 2; width: 52px; height: 52px; background-color: rgba(255, 255, 255, 0.15); border-radius: 16px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 8px 16px rgba(0,0,0,0.1); flex-shrink: 0; }
+        .tb-action svg { width: 24px; height: 24px; stroke: #ffffff; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        .bottom-nav { background-color: #ffffff; display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1); position: fixed; bottom: 0; left: 0; right: 0; z-index: 1001; transition: transform 0.3s ease; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-decoration: none; color: #64748B; font-size: 9.5px; font-weight: 500; transition: all 0.3s ease; cursor: pointer; flex: 1; }
+        .nav-item.active { color: #10B981; }
+        .nav-icon { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; fill: none; margin-bottom: 2px; }
+        .nav-item.active .nav-icon { fill: rgba(16, 185, 129, 0.1); }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 17, 40, 0.4); backdrop-filter: blur(4px); z-index: 5000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .range-modal { background: #ffffff; border-radius: 20px; padding: 24px; width: 85%; max-width: 340px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); transform: translateY(20px); transition: transform 0.3s ease; font-family: 'Poppins', sans-serif; }
+        .modal-overlay.show .range-modal { transform: translateY(0); }
+        .modal-title { font-size: 16px; font-weight: 600; color: #0A1128; margin: 0 0 16px 0; }
+        .input-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        .input-field { display: flex; flex-direction: column; gap: 4px; }
+        .input-field label { font-size: 11px; font-weight: 500; color: #64748B; }
+        .input-field input, .input-field select { width: 100%; min-width: 0; box-sizing: border-box; padding: 10px 12px; border-radius: 12px; border: 1px solid #CBD5E1; font-family: 'Poppins', sans-serif; font-size: 14px; color: #334155; outline: none; transition: all 0.2s ease; background: #fff; }
+        .input-field input:focus, .input-field select:focus { border-color: #10B981; box-shadow: 0 0 0 3px rgba(16,185,129,0.1); }
+        ::-webkit-calendar-picker-indicator { filter: invert(0.5) sepia(1) saturate(5) hue-rotate(150deg); cursor: pointer; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+        .btn-cancel { background: #F1F5F9; color: #64748B; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 500; font-family: 'Poppins', sans-serif; cursor: pointer; }
+        .btn-apply { background: #10B981; color: #ffffff; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 500; font-family: 'Poppins', sans-serif; cursor: pointer; box-shadow: 0 4px 10px rgba(16,185,129,0.2); }
+        .app-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #F8FAFC; z-index: 3000; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); font-family: 'Poppins', sans-serif; }
+        .app-screen.active { transform: translateX(0); }
+        .screen-header { background: #ffffff; padding: 16px 20px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #E2E8F0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); z-index: 10; }
+        .back-btn { background: none; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .back-btn svg { width: 24px; height: 24px; stroke: #0A1128; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+        .screen-title { font-size: 18px; font-weight: 600; color: #0A1128; margin: 0; }
+        .screen-content { flex: 1; padding: 20px; overflow-y: auto; padding-bottom: 110px; scroll-behavior: smooth; }
+        .premium-dealer-input { margin-bottom: 24px; background: #ffffff; padding: 16px; border-radius: 16px; border: 2px solid #E2E8F0; box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: border-color 0.3s, box-shadow 0.3s; }
+        .premium-dealer-input:focus-within { border-color: #10B981; box-shadow: 0 4px 16px rgba(16,185,129,0.1); }
+        .premium-dealer-input label { font-size: 14px; font-weight: 700; color: #0A1128; margin-bottom: 8px; display: block; }
+        .p-input-box { display: flex; align-items: center; background: transparent; }
+        .p-input-box svg { width: 22px; height: 22px; stroke: #10B981; fill: none; stroke-width: 2.5; margin-right: 12px; stroke-linecap: round; stroke-linejoin: round; }
+        .p-input-box input { flex: 1; padding: 8px 0; border: none; outline: none; font-size: 16px; font-weight: 600; color: #0A1128; font-family: 'Poppins'; background: transparent; }
+        .p-input-box input::placeholder { font-weight: 400; color: #94A3B8; }
+        .search-container { position: relative; margin-bottom: 20px; }
+        .search-input-wrapper { position: relative; display: flex; align-items: center; }
+        .search-icon { position: absolute; left: 14px; width: 18px; height: 18px; stroke: #94A3B8; stroke-width: 2.5; fill: none; }
+        .search-box { width: 100%; padding: 14px 14px 14px 40px; border-radius: 16px; border: 1px solid #CBD5E1; background: #ffffff; font-family: 'Poppins', sans-serif; font-size: 14px; color: #0A1128; outline: none; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: all 0.2s; }
+        .search-box:focus { border-color: #10B981; box-shadow: 0 0 0 3px rgba(16,185,129,0.1); }
+        .autocomplete-dropdown { position: absolute; top: calc(100% + 8px); left: 0; right: 0; background: #ffffff; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-height: 250px; overflow-y: auto; z-index: 20; display: none; border: 1px solid #E2E8F0; }
+        .autocomplete-dropdown.show { display: block; }
+        .dropdown-item-premium { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #F1F5F9; transition: background 0.2s; }
+        .dropdown-item-premium:last-child { border-bottom: none; }
+        .dropdown-item-premium:active { background: #F8FAFC; }
+        .item-info-left { display: flex; align-items: center; gap: 12px; }
+        .item-icon-box { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .icon-metal { background: #EFF6FF; color: #3B82F6;} .icon-plastic { background: #ECFDF5; color: #10B981;} .icon-paper { background: #F5F3FF; color: #8B5CF6;} 
+        .item-icon-box svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;}
+        .item-name { font-size: 13.5px; font-weight: 600; color: #1E293B; }
+        .item-rate-badge { font-size: 11px; font-weight: 600; color: #64748B; background: #F1F5F9; padding: 4px 8px; border-radius: 8px;}
+        .config-card { background: #ffffff; border-radius: 20px; padding: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); border: 1px solid #E2E8F0; display: none; margin-bottom: 20px; animation: fadeIn 0.3s ease; scroll-margin-top: 20px; }
+        @keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+        .config-card.show { display: block; }
+        .selected-item-title { font-size: 18px; font-weight: 700; color: #0F172A; margin: 0 0 20px 0; padding-bottom: 12px; border-bottom: 1px solid #F1F5F9; }
+        .input-row { display: flex; gap: 16px; margin-bottom: 20px; }
+        .input-wrapper { flex: 1; position: relative; }
+        .input-wrapper label { display: block; font-size: 12px; font-weight: 600; color: #64748B; margin-bottom: 8px; }
+        .input-wrapper input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #CBD5E1; font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: #0F172A; outline: none; }
+        .input-wrapper input:focus { border-color: #0A1128; }
+        .unit-label { position: absolute; right: 14px; top: 38px; font-size: 14px; font-weight: 600; color: #94A3B8; }
+        .btn-add-cart { width: 100%; padding: 16px; border-radius: 14px; font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; border: none; cursor: pointer; color: #ffffff; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); transition: transform 0.2s; }
+        .btn-add-cart:active { transform: scale(0.98); }
+        .btn-add-purchase { background: linear-gradient(135deg, #10B981 0%, #047857 100%); box-shadow: 0 8px 16px rgba(16,185,129,0.2); }
+        .btn-add-dispatch { background: linear-gradient(135deg, #10B981 0%, #047857 100%); box-shadow: 0 8px 16px rgba(16,185,129,0.2); }
+        .cart-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        .cart-item { background: #ffffff; border-radius: 16px; padding: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #E2E8F0; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        .cart-item-details { display: flex; flex-direction: column; gap: 4px; }
+        .cart-item-name { font-size: 14px; font-weight: 700; color: #0F172A; margin: 0;}
+        .cart-item-calc { font-size: 12px; color: #64748B; font-weight: 500; margin: 0; }
+        .cart-item-right { display: flex; align-items: center; gap: 16px; }
+        .cart-item-total { font-size: 16px; font-weight: 700; color: #0F172A; }
+        .btn-remove { background: #FEF2F2; color: #EF4444; border: none; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .btn-remove svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .screen-footer { position: absolute; bottom: 0; left: 0; right: 0; background: #ffffff; padding: 16px 20px; border-top: 1px solid #E2E8F0; box-shadow: 0 -8px 24px rgba(0,0,0,0.05); z-index: 10; }
+        .total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .total-label { font-size: 14px; font-weight: 600; color: #64748B; }
+        .total-amount { font-size: 26px; font-weight: 800; color: #0F172A; letter-spacing: -0.5px; }
+        .btn-execute { width: 100%; padding: 16px; border-radius: 16px; font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; border: none; cursor: pointer; color: #ffffff; display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform 0.2s; }
+        .btn-execute:active { transform: scale(0.98); }
+        .btn-execute-purchase { background: #0A1128; box-shadow: 0 8px 24px rgba(10,17,40,0.2); }
+        .btn-execute-dispatch { background: #0A1128; box-shadow: 0 8px 24px rgba(10,17,40,0.2); }
+        .txn-top-wrapper { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: nowrap;}
+        .txn-top-wrapper .page-header-wrapper { margin-bottom: 0; width: 100%; box-shadow: none; border: none; padding: 0; background: transparent;}
+        .txn-list { display: flex; flex-direction: column; padding-bottom: 40px;}
+        .txn-card { background: #ffffff; border-radius: 16px; border: 1px solid #E2E8F0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); overflow: hidden; transition: all 0.3s ease; margin-bottom: 16px; }
+        .txn-card-header { padding: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .txn-info-left { display: flex; align-items: center; gap: 12px; }
+        .txn-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .txn-icon.in { background: #ECFDF5; color: #10B981; }
+        .txn-icon.out { background: #FEF2F2; color: #EF4444; }
+        .txn-icon svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        .txn-title { font-size: 14px; font-weight: 700; color: #0F172A; margin: 0 0 2px 0; line-height: 1.3;}
+        .txn-date { font-size: 11px; font-weight: 500; color: #64748B; margin: 0; }
+        .txn-amount { font-size: 15px; font-weight: 700; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 2px; white-space: nowrap; flex-shrink: 0; }
+        .txn-amount.in { color: #10B981; }
+        .txn-amount.out { color: #EF4444; }
+        .txn-details { display: none; padding: 0 16px 16px 16px; border-top: 1px dashed #F1F5F9; margin-top: 4px; }
+        .txn-card.expanded .txn-details { display: block; animation: fadeIn 0.3s ease; }
+        .txn-detail-item { display: flex; justify-content: space-between; font-size: 12px; color: #475569; margin-top: 10px; font-weight: 500; }
+        .analysis-top-wrapper { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: nowrap;}
+        .analysis-top-wrapper .page-header-wrapper { margin-bottom: 0; width: 100%; box-shadow: none; border: none; padding: 0; background: transparent;}
+        .analysis-list { display: flex; flex-direction: column; gap: 12px; padding-bottom: 40px;}
+        .analysis-card { background: #ffffff; border-radius: 16px; border: 1px solid #E2E8F0; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: space-between; padding: 16px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+        .analysis-card:active { transform: scale(0.98); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .analysis-card .item-info-left { gap: 14px; }
+        .analysis-card .item-name { font-size: 15px; font-weight: 600; color: #0F172A; }
+        .analysis-card .item-meta { font-size: 12px; color: #64748B; font-weight: 500; margin-top: 2px;}
+        .analysis-card-right svg { width: 20px; height: 20px; stroke: #94A3B8; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+        .search-and-add { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .btn-add-material-side { width: 48px; height: 48px; border-radius: 16px; background: #ECFDF5; color: #10B981; border: 1px dashed #10B981; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; transition: transform 0.2s; }
+        .btn-add-material-side:active { transform: scale(0.95); }
+        .search-back { display: none; }
+        
+        body.search-active .header-container, body.search-active .bottom-nav, body.search-active .analysis-top-wrapper, body.search-active .btn-add-material-side { display: none !important; }
+        body.search-active .dashboard-wrapper { background-color: #ffffff; padding: 20px 16px; }
+        body.search-active .search-mag { display: none; }
+        body.search-active .search-back { display: block; stroke: #0A1128; cursor: pointer; }
+        
+        /* Updated Search Active behavior for Dealer Tab */
+        body.search-active .dealer-summary-boxes,
+        body.search-active .dealer-tabs,
+        body.search-active #section-dealers .page-header-wrapper { display: none !important; }
+        
+        .item-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+        .item-stat-card { background: #ffffff; border-radius: 16px; padding: 16px; border: 1px solid #E2E8F0; }
+        .item-stat-title { font-size: 12px; color: #64748B; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
+        .item-stat-qty { font-size: 22px; font-weight: 700; color: #0F172A; }
+        .item-stat-amt { font-size: 13px; font-weight: 600; margin-top: 4px; }
+        .item-stat-amt.in { color: #10B981; }
+        .item-stat-amt.out { color: #EF4444; }
+        /* =========================================
+           BANKING GRADE DEALERS UI (UPDATED LAYOUT)
+           ========================================= */
+        .dealer-summary-boxes { display: flex; gap: 12px; margin-bottom: 16px; }
+        .d-box { flex: 1; border-radius: 12px; padding: 16px; color: white; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .d-box-red { background: #EF4444; }
+        .d-box-green { background: #10B981; }
+        .d-box-title { font-size: 12px; font-weight: 500; display: flex; justify-content: space-between; align-items: center; opacity: 0.9; }
+        .d-box-value { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+        .d-box-sub { font-size: 11px; font-weight: 500; opacity: 0.9; }
+        .dealer-tabs { display: flex; border-bottom: 2px solid #E2E8F0; margin-bottom: 16px; }
+        .d-tab { flex: 1; text-align: center; padding: 12px 0; font-size: 13px; font-weight: 700; color: #64748B; cursor: pointer; transition: all 0.2s; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+        .d-tab.active { color: #0A1128; border-bottom-color: #0A1128; }
+        .dealer-card { background: #ffffff; border-radius: 12px; border: 1px solid #E2E8F0; margin-bottom: 14px; display: flex; flex-direction: column; box-shadow: 0 2px 8px rgba(0,0,0,0.02); overflow: hidden; padding: 0; }
+        .dealer-card-main { display: flex; padding: 16px; gap: 12px; align-items: center; cursor: pointer; }
+        .dealer-avatar { width: 44px; height: 44px; border-radius: 50%; background: #64748B; color: white; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600; flex-shrink: 0; }
+        .dealer-info-middle { flex: 1; min-width: 0; }
+        .dealer-name { font-size: 15px; font-weight: 600; color: #0F172A; margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .dealer-loc { font-size: 12px; color: #64748B; margin: 0 0 2px 0; }
+        .dealer-id { font-size: 11px; color: #94A3B8; margin: 0; }
+        .dealer-info-right { text-align: right; flex-shrink: 0; }
+        .dealer-amt { font-size: 16px; font-weight: 700; margin: 0 0 4px 0; }
+        .dealer-amt.red { color: #EF4444; }
+        .dealer-amt.green { color: #10B981; }
+        .dealer-date { font-size: 11px; color: #64748B; margin: 0; }
+        .dealer-card-actions { display: flex; border-top: 1px solid #F1F5F9; }
+        .d-action-btn { flex: 1; display: flex; justify-content: center; align-items: center; gap: 6px; padding: 12px 0; font-size: 13px; font-weight: 600; color: #334155; background: none; border: none; cursor: pointer; transition: background 0.2s; }
+        .d-action-btn:active { background: #F8FAFC; }
+        .d-action-btn:first-child { border-right: 1px solid #F1F5F9; }
+        .d-action-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .dealer-header-premium {
+            background: linear-gradient(135deg, #10B981 0%, #047857 100%); border-radius: 24px; padding: 24px; color: white;
+            box-shadow: 0 16px 32px rgba(16,185,129,0.2); margin-bottom: 20px; position: relative; overflow: hidden;
+        }
+        .dh-title { font-size: 22px; font-weight: 700; margin: 0 0 20px 0; display: flex; align-items: center; gap: 12px; }
+        .dh-avatar { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.1); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; font-size: 18px; border: 1px solid rgba(255,255,255,0.2); }
+        .dh-kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .dh-kpi { background: rgba(0, 0, 0, 0.2); padding: 14px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.3); }
+        .dh-kpi-label { font-size: 11px; color: #E2E8F0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .dh-kpi-val { font-size: 20px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        
+        .status-badge { font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 6px; letter-spacing: 0.5px; text-transform: uppercase; display: inline-block; margin-left: 8px; }
+        .badge-due { background: #FEF2F2; color: #EF4444; }
+        .badge-paid { background: #ECFDF5; color: #10B981; }
+        .badge-partial { background: #FFFBEB; color: #F59E0B; }
+        
+        .btn-mark-paid { background: #0A1128; color: #ffffff; border: none; font-size: 11.5px; font-weight: 600; padding: 8px 14px; border-radius: 10px; cursor: pointer; transition: all 0.2s; font-family: 'Poppins', sans-serif; margin-top: 10px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(10,17,40,0.15); }
+        .btn-mark-paid:active { transform: scale(0.95); }
+        
+        .filter-tabs { display: flex; background: #F1F5F9; border-radius: 14px; padding: 4px; margin-bottom: 20px; }
+        .filter-tab { flex: 1; text-align: center; padding: 10px 0; font-size: 13px; font-weight: 600; color: #64748B; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+        .filter-tab.active { background: #ffffff; color: #0A1128; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .payment-input-group { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 16px; padding: 16px; margin: 16px 0; }
+        .payment-input-wrap { display: flex; align-items: center; background: #ffffff; border: 1px solid #CBD5E1; border-radius: 12px; padding: 12px 16px; margin-top: 8px; }
+        .payment-input-wrap span { font-size: 18px; font-weight: 700; color: #64748B; margin-right: 8px; }
+        .payment-input-wrap input { flex: 1; border: none; outline: none; font-size: 20px; font-weight: 700; color: #0F172A; font-family: 'Poppins'; }
+        .invoice-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #52525B; z-index: 4000; display: none; flex-direction: column; }
+        .invoice-overlay.show { display: flex; }
+        .invoice-actions { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; background: #3F3F46; }
+        .invoice-actions button { background: #ffffff; color: #0F172A; border: none; padding: 8px 16px; border-radius: 8px; font-family: 'Poppins', sans-serif; font-weight: 600; cursor: pointer; display: flex; gap: 6px; align-items: center; }
+        .invoice-scroll { flex: 1; overflow: auto; padding: 20px; display: flex; justify-content: center; background: #52525B; }
+        .invoice-paper { background: #ffffff; width: 100%; max-width: 600px; padding: 16px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); font-family: 'Arial', sans-serif; color: #000; box-sizing: border-box; margin: 0 auto; height: fit-content; }
+        .inv-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
+        .inv-title { font-size: 22px; font-weight: 800; margin: 0 0 4px 0; letter-spacing: 1px; color: #000; }
+        .inv-sub { font-size: 10px; margin: 2px 0; color: #333; }
+        .inv-meta { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 11px; font-weight: bold; color: #000;}
+        .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; table-layout: fixed; word-wrap: break-word; }
+        .inv-table th, .inv-table td { border: 1px solid #000; padding: 6px 4px; text-align: left; font-size: 10px; }
+        .inv-table th { background-color: #f4f4f4; font-weight: bold; }
+        .inv-table th:nth-child(1) { width: 10%; } .inv-table th:nth-child(2) { width: 45%; } .inv-table th:nth-child(3) { width: 15%; } .inv-table th:nth-child(4) { width: 15%; } .inv-table th:nth-child(5) { width: 15%; } 
+        .inv-table .text-right { text-align: right; }
+        .inv-total { text-align: right; font-size: 16px; font-weight: bold; margin-top: 10px; }
+        .inv-footer { margin-top: 30px; text-align: center; font-size: 10px; font-style: italic; border-top: 1px solid #ccc; padding-top: 10px;}
+        @media print {
+            @page { size: A4; margin: 15mm; } 
+            html, body { height: auto !important; min-height: 100% !important; margin: 0 !important; padding: 0 !important; background: #fff !important; position: static !important; overflow: visible !important; display: block !important; }
+            body > *:not(#invoiceOverlay) { display: none !important; }
+            #premium-toast { display: none !important; }
+            #invoiceOverlay { display: block !important; position: static !important; background: white !important; height: auto !important; overflow: visible !important; }
+            .invoice-scroll { display: block !important; position: static !important; padding: 0 !important; background: transparent !important; overflow: visible !important; height: auto !important; }
+            .invoice-actions { display: none !important; }
+            .invoice-paper { display: block !important; box-shadow: none !important; border: none !important; padding: 0 !important; width: 100% !important; max-width: none !important; margin: 0 !important; height: auto !important; }
+            .inv-title { font-size: 32px !important; }
+            .inv-sub { font-size: 13px !important; }
+            .inv-meta { font-size: 15px !important; margin-bottom: 30px !important; }
+            .inv-table th, .inv-table td { padding: 12px 14px !important; font-size: 14px !important; }
+            .inv-total { font-size: 20px !important; }
+            .inv-footer { font-size: 13px !important; margin-top: 40px !important; }
+            .inv-table { page-break-inside: auto !important; border-collapse: collapse !important; }
+            .inv-table tr { page-break-inside: avoid !important; page-break-after: auto !important; }
+            .inv-table thead { display: table-header-group !important; } 
+            .inv-table tbody { display: table-row-group !important; } 
+            #inv-slip-container { display: block !important; page-break-inside: avoid !important; break-inside: avoid !important; margin-top: 40px !important; }
+            #inv-slip-img { display: block !important; max-width: 100% !important; max-height: 240mm !important; object-fit: contain !important; page-break-inside: avoid !important; break-inside: avoid !important; }
+        }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0;}
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #CBD5E1; transition: .4s; border-radius: 24px;}
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;}
+        input:checked + .slider { background-color: #10B981; }
+        input:checked + .slider:before { transform: translateX(20px); }
+    </style>
+</head>
+<body>
+    <div id="premium-toast" class="premium-toast"><span id="toast-msg"></span></div>
+    <div id="login-screen" class="login-overlay">
+        <div class="login-card">
+            <div class="login-header">
+                <span class="login-icon">♻️</span>
+                <h2 class="login-title">Sarkar Enterprises</h2>
+                <p class="login-subtitle">Sign in to your premium dashboard</p>
+            </div>
+            <div class="login-input-group">
+                <div class="login-input-wrapper">
+                    <svg class="input-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <input type="text" id="loginId" class="login-input" placeholder="Enter Login ID">
+                </div>
+                <div class="login-input-wrapper">
+                    <svg class="input-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <input type="password" id="loginPass" class="login-input" placeholder="Enter Password">
+                    <svg class="password-toggle" id="togglePass" onclick="togglePasswordVisibility()" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </div>
+                <p class="login-error" id="loginError">Incorrect ID or Password</p>
+            </div>
+            <button class="login-btn" onclick="processLogin()">Secure Login</button>
+        </div>
+    </div>
+    <header class="header-container">
+        <div class="brand-wrapper">
+            <span class="scrap-icon-text">♻️</span>
+            <div class="text-stack">
+                <h1 class="brand-title">SARKAR ENTERPRISES</h1>
+                <p class="brand-subtitle">supply all types of scrap</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div class="basket-btn basket-btn-settings" onclick="openAppScreen('settings')">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </div>
+            <div class="basket-btn basket-btn-logout" onclick="logoutApp()">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            </div>
+        </div>
+    </header>
+    <div class="dashboard-wrapper" id="dashWrapper">
+        <div class="pull-to-refresh-loader" id="ptrLoader"><div class="ptr-spinner"></div></div>
+        <div id="section-home" class="view-section active">
+            <div class="analytics-section-top">
+                <div class="greeting-box">
+                    <h2 class="greeting-message" id="greetingMessage">Hey <span class="name-highlight">Raju</span> <span class="waving-hand">👋</span></h2>
+                    <p class="greeting-subtext" id="greetingSub">Here's your latest overview</p>
+                </div>
+                <div class="custom-dropdown-wrapper">
+                    <button class="sort-btn" id="sortBtn"><span id="sortBtnText">Today</span><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+                    <div class="custom-menu" id="customMenu">
+                        <label class="dropdown-item"><span class="item-text">Today</span><input type="radio" name="sortFilter" value="Today" checked><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">Yesterday</span><input type="radio" name="sortFilter" value="Yesterday"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">This Week</span><input type="radio" name="sortFilter" value="This Week"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">This Month</span><input type="radio" name="sortFilter" value="This Month"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">Last 2 Months</span><input type="radio" name="sortFilter" value="Last 2 Months"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">Last 3 Months</span><input type="radio" name="sortFilter" value="Last 3 Months"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">1 Year</span><input type="radio" name="sortFilter" value="1 Year"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text" id="label-custom-date">Custom Date Range</span><input type="radio" name="sortFilter" value="Custom Date Range"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text" id="label-custom-month">Custom Month Range</span><input type="radio" name="sortFilter" value="Custom Month Range"><span class="custom-radio"></span></label>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-card">
+                <div class="hero-title">Yard Valuation (Stock × Buy Rate)</div>
+                <div class="hero-value"><span id="hero-val-span">₹0</span></div>
+                <div class="hero-badge" id="hero-stock-span">Physical Stock: 0 Kg</div>
+                <svg class="hero-wave" preserveAspectRatio="none" viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="4" d="M0,160 C320,300 420,0 720,120 C1020,240 1120,60 1440,160"></path><path fill="rgba(255,255,255,0.15)" d="M0,160 C320,300 420,0 720,120 C1020,240 1120,60 1440,160 L1440,320 L0,320 Z"></path><circle cx="1020" cy="115" r="6" fill="#fff" stroke="rgba(255,255,255,0.5)" stroke-width="4"/></svg>
+            </div>
+            <div class="stats-grid">
+                <div class="premium-card"><div class="pc-header"><span class="pc-label">Gross<br>Revenue</span><div class="pc-icon icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg></div></div><div class="pc-value"><span id="card-gross-val">₹0</span></div><div class="pc-footer"><span class="pc-trend trend-neutral" id="card-gross-trend">− 0%</span><span class="pc-subtitle" id="card-gross-vs">vs prev</span></div></div>
+                <div class="premium-card"><div class="pc-header"><span class="pc-label">Net Est.<br>Profit</span><div class="pc-icon icon-green"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg></div></div><div class="pc-value"><span id="card-profit-val">₹0</span></div><div class="pc-footer"><span class="pc-trend trend-neutral" id="card-profit-trend">− 0%</span><span class="pc-subtitle" id="card-profit-vs">vs prev</span></div></div>
+                <div class="premium-card"><div class="pc-header"><span class="pc-label">Local<br>Purchases</span><div class="pc-icon icon-orange"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></div></div><div class="pc-value"><span id="card-purchases-val">₹0</span></div><div class="pc-footer"><span class="pc-trend trend-neutral" id="card-purchases-trend">− 0%</span><span class="pc-subtitle" id="card-purchases-vs">vs prev</span></div></div>
+                <div class="premium-card"><div class="pc-header"><span class="pc-label">Material<br>Handled</span><div class="pc-icon icon-purple"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20"></path><path d="M12 2v20"></path><path d="M6 16v-4"></path><path d="M18 16v-8"></path></svg></div></div><div class="pc-value"><span id="card-handled-val">0</span> <span style="font-size: 14px; color: #94A3B8; font-weight: 500;">Units</span></div><div class="pc-footer"><span class="pc-trend trend-neutral" id="card-handled-trend">− 0%</span><span class="pc-subtitle" id="card-handled-vs">vs prev</span></div></div>
+            </div>
+        </div>
+        <div id="section-trade" class="view-section">
+            <div class="page-header-wrapper">
+                <div class="page-header-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>
+                <div class="page-header-text">
+                    <h2 class="page-header-title">Trade Operations</h2>
+                    <p class="page-header-subtitle">Manage your daily scrap flow</p>
+                </div>
+            </div>
+            <div class="trade-banners-container">
+                <div class="trade-banner banner-purchase" onclick="openAppScreen('purchase')">
+                    <div class="bg-shape bg-shape-1"></div><div class="bg-shape bg-shape-2"></div>
+                    <svg class="bg-icon bg-icon-1" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    <div class="tb-content"><h3 class="tb-title">Purchase<br>Scrap</h3><p class="tb-subtitle">Inward stock from Locals</p></div>
+                    <div class="tb-action"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></div>
+                </div>
+                <div class="trade-banner banner-dispatch" onclick="openAppScreen('dispatch')">
+                    <div class="bg-shape bg-shape-1"></div><div class="bg-shape bg-shape-2"></div>
+                    <svg class="bg-icon bg-icon-1" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                    <div class="tb-content"><h3 class="tb-title">Dispatch<br>Scrap</h3><p class="tb-subtitle">Outward sale to Dealers</p></div>
+                    <div class="tb-action"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></div>
+                </div>
+            </div>
+        </div>
+        <div id="section-transaction" class="view-section">
+            <div class="txn-top-wrapper">
+                <div class="page-header-wrapper">
+                    <div class="page-header-icon"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg></div>
+                    <div class="page-header-text">
+                        <h2 class="page-header-title">Transactions</h2>
+                        <p class="page-header-subtitle">View your payment history</p>
+                    </div>
+                </div>
+                <div class="custom-dropdown-wrapper" style="margin-left: 10px;">
+                    <button class="sort-btn" id="txnSortBtn"><span id="txnSortBtnText">Today</span><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+                    <div class="custom-menu" id="txnCustomMenu">
+                        <label class="dropdown-item"><span class="item-text">Today</span><input type="radio" name="txnSortFilter" value="Today" checked><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">Yesterday</span><input type="radio" name="txnSortFilter" value="Yesterday"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">This Week</span><input type="radio" name="txnSortFilter" value="This Week"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">This Month</span><input type="radio" name="txnSortFilter" value="This Month"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">Last 2 Months</span><input type="radio" name="txnSortFilter" value="Last 2 Months"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">Last 3 Months</span><input type="radio" name="txnSortFilter" value="Last 3 Months"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">1 Year</span><input type="radio" name="txnSortFilter" value="1 Year"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text" id="txn-label-custom-date">Custom Date Range</span><input type="radio" name="txnSortFilter" value="Custom Date Range"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text" id="txn-label-custom-month">Custom Month Range</span><input type="radio" name="txnSortFilter" value="Custom Month Range"><span class="custom-radio"></span></label>
+                    </div>
+                </div>
+            </div>
+            <div class="txn-list" id="transaction-list"></div>
+        </div>
+        
+        <div id="section-analysis" class="view-section">
+            <div class="analysis-top-wrapper">
+                <div class="page-header-wrapper">
+                    <div class="page-header-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div>
+                    <div class="page-header-text">
+                        <h2 class="page-header-title">Analysis</h2>
+                        <p class="page-header-subtitle">Item-wise business insights</p>
+                    </div>
+                </div>
+                <div class="custom-dropdown-wrapper" style="margin-left: 10px;">
+                    <button class="sort-btn" id="analysisSortBtn"><span id="analysisSortBtnText">Today</span><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+                    <div class="custom-menu" id="analysisCustomMenu">
+                        <label class="dropdown-item"><span class="item-text">Today</span><input type="radio" name="analysisSortFilter" value="Today" checked><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">Yesterday</span><input type="radio" name="analysisSortFilter" value="Yesterday"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">This Week</span><input type="radio" name="analysisSortFilter" value="This Week"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">This Month</span><input type="radio" name="analysisSortFilter" value="This Month"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">Last 2 Months</span><input type="radio" name="analysisSortFilter" value="Last 2 Months"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">Last 3 Months</span><input type="radio" name="analysisSortFilter" value="Last 3 Months"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">1 Year</span><input type="radio" name="analysisSortFilter" value="1 Year"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text" id="ana-label-custom-date">Custom Date Range</span><input type="radio" name="analysisSortFilter" value="Custom Date Range"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text" id="ana-label-custom-month">Custom Month Range</span><input type="radio" name="analysisSortFilter" value="Custom Month Range"><span class="custom-radio"></span></label>
+                    </div>
+                </div>
+            </div>
+            <div class="search-and-add">
+                <div class="search-container" style="flex: 1; margin-bottom: 0;">
+                    <div class="search-input-wrapper">
+                        <svg class="search-icon search-mag" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <svg class="search-icon search-back" viewBox="0 0 24 24" onclick="closeAnalysisSearch()"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                        <input type="text" class="search-box" id="a-search" placeholder="Search to view insights..." autocomplete="off">
+                    </div>
+                </div>
+                <button class="btn-add-material-side" onclick="openAppScreen('add-item')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+            </div>
+            <div class="analysis-list" id="analysis-list-container"></div>
+        </div>
+        <div id="section-dealers" class="view-section">
+            <div class="page-header-wrapper" style="width: 100%; margin-bottom: 16px;">
+                <div class="page-header-icon" style="background-color: #EFF6FF;">
+                    <svg viewBox="0 0 24 24" stroke="#3B82F6" stroke-width="2.2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </div>
+                <div class="page-header-text">
+                    <h2 class="page-header-title">Dealer Payments</h2>
+                    <p class="page-header-subtitle">Manage payments & dues</p>
+                </div>
+            </div>
+            <div class="dealer-summary-boxes">
+                <div class="d-box d-box-red">
+                    <div class="d-box-title">Total Due <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
+                    <div class="d-box-value" id="global-total-due">₹0.00</div>
+                    <div class="d-box-sub" id="global-due-count">0 Dealers</div>
+                </div>
+                <div class="d-box d-box-green">
+                    <div class="d-box-title">Total Paid (Overall) <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+                    <div class="d-box-value" id="global-total-paid">₹0.00</div>
+                    <div class="d-box-sub" id="global-paid-count">0 Dealers</div>
+                </div>
+            </div>
+            <div class="search-container" style="margin: 0 16px 16px 16px;">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon search-mag" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <svg class="search-icon search-back" id="dealer-search-close" viewBox="0 0 24 24" onclick="closeDealerMainSearch()"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    <input type="text" class="search-box" id="dealer-main-search" placeholder="Search Dealer Name..." autocomplete="off">
+                </div>
+                <div class="autocomplete-dropdown" id="dealer-main-dropdown"></div>
+            </div>
+            <div class="dealer-tabs">
+                <div class="d-tab active" onclick="setGlobalDealerTab('due', this)">DUE PAYMENTS</div>
+                <div class="d-tab" onclick="setGlobalDealerTab('paid', this)">PAID HISTORY</div>
+            </div>
+            <div class="txn-list" id="dealer-list-container" style="padding: 0 16px 40px 16px;"></div>
+        </div>
+    </div>
+    <nav class="bottom-nav">
+        <a class="nav-item active" onclick="switchTab('home', this)">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span>Home</span>
+        </a>
+        <a class="nav-item" onclick="switchTab('trade', this)">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+            <span>Trade</span>
+        </a>
+        <a class="nav-item" onclick="switchTab('transaction', this)">
+            <svg class="nav-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            <span>History</span>
+        </a>
+        <a class="nav-item" onclick="switchTab('analysis', this)">
+            <svg class="nav-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            <span>Analysis</span>
+        </a>
+        <a class="nav-item" onclick="switchTab('dealers', this)">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span>Dealers</span>
+        </a>
+    </nav>
+    <div id="screen-settings" class="app-screen">
+        <div class="screen-header">
+            <button class="back-btn" onclick="closeAppScreen('settings')"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button>
+            <h2 class="screen-title">App Settings</h2>
+        </div>
+        <div class="screen-content">
+            <div class="settings-section">
+                <h3 class="settings-title">Security</h3>
+                <div class="settings-item" onclick="document.getElementById('changeCredsForm').style.display = document.getElementById('changeCredsForm').style.display === 'none' ? 'block' : 'none'">
+                    <div class="settings-item-left">
+                        <div class="settings-item-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
+                        <div class="settings-item-text"><h4>Change ID & Password</h4><p>Update your login credentials</p></div>
+                    </div>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+                <div id="changeCredsForm" style="display:none; padding: 16px 0; border-top: 1px dashed #E2E8F0; margin-top: 16px;">
+                    <div class="input-field" style="margin-bottom:12px;"><label>New Login ID</label><input type="text" id="newCredId" placeholder="Enter new ID"></div>
+                    <div class="input-field" style="margin-bottom:16px;"><label>New Password</label><input type="text" id="newCredPass" placeholder="Enter new password"></div>
+                    <button class="btn-execute btn-execute-purchase" style="padding: 12px; border-radius: 10px;" onclick="saveNewCredentials()">Save Credentials</button>
+                </div>
+            </div>
+            <div class="settings-section">
+                <h3 class="settings-title">Data Management</h3>
+                <div class="settings-item" onclick="exportData()">
+                    <div class="settings-item-left">
+                        <div class="settings-item-icon" style="color: #10B981; background: #ECFDF5;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></div>
+                        <div class="settings-item-text"><h4>Export Data</h4><p>Download a backup of your app</p></div>
+                    </div>
+                </div>
+                <div class="settings-item" onclick="document.getElementById('importFile').click()">
+                    <div class="settings-item-left">
+                        <div class="settings-item-icon" style="color: #3B82F6; background: #EFF6FF;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></div>
+                        <div class="settings-item-text"><h4>Import Data</h4><p>Restore from a backup file</p></div>
+                    </div>
+                    <input type="file" id="importFile" accept=".json" style="display:none" onchange="processImport(event)">
+                </div>
+            </div>
+            <div class="settings-section">
+                <h3 class="settings-title" style="color: #EF4444;">Danger Zone</h3>
+                <div class="settings-item settings-danger" onclick="document.getElementById('resetModal').classList.add('show')">
+                    <div class="settings-item-left">
+                        <div class="settings-item-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></div>
+                        <div class="settings-item-text"><h4>Reset Data</h4><p>Permanently delete everything</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="screen-purchase" class="app-screen">
+        <div class="screen-header">
+            <button class="back-btn" onclick="closeAppScreen('purchase')"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button>
+            <h2 class="screen-title">Purchase Scrap</h2>
+        </div>
+        <div class="screen-content" id="p-scroll-area">
+            <div class="search-container">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" class="search-box purchase-theme" id="p-search" placeholder="Search material..." autocomplete="off" onkeyup="handleSearch('purchase', this.value)">
+                </div>
+                <div class="autocomplete-dropdown" id="p-dropdown"></div>
+            </div>
+            <div class="config-card" id="p-config">
+                <h4 class="selected-item-title" id="p-selected-name">Item Name</h4>
+                <div class="input-row">
+                    <div class="input-wrapper"><label>Rate (₹)</label><input type="number" id="p-rate" step="0.01" onfocus="handleInputFocus(this)"><span class="unit-label">/ <span id="p-unit-lbl-1">kg</span></span></div>
+                    <div class="input-wrapper"><label>Quantity</label><input type="number" id="p-qty" step="0.01" onfocus="handleInputFocus(this)"><span class="unit-label" id="p-unit-lbl-2">kg</span></div>
+                </div>
+                <button class="btn-add-cart btn-add-purchase" onclick="addToCart('purchase')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Add to Bill</button>
+            </div>
+            <div class="cart-list" id="p-cart-list"></div>
+        </div>
+        <div class="screen-footer">
+            <div class="total-row"><span class="total-label">Total Amount</span><span class="total-amount">₹<span id="p-total">0</span></span></div>
+            <button class="btn-execute btn-execute-purchase" onclick="executeAction('purchase')">Execute Purchase</button>
+        </div>
+    </div>
+    <div id="screen-dispatch" class="app-screen">
+        <div class="screen-header">
+            <button class="back-btn" onclick="closeAppScreen('dispatch')"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button>
+            <h2 class="screen-title">Dispatch Scrap</h2>
+        </div>
+        <div class="screen-content" id="d-scroll-area">
+            
+            <div class="premium-dealer-input" style="position:relative; z-index: 25;">
+                <label>Dealer / Company Name <span style="color:#EF4444">*</span></label>
+                <div class="p-input-box">
+                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <input type="text" id="d-dealer-name" placeholder="Enter dealer name..." autocomplete="off" onkeyup="handleDealerSearch(this.value)">
+                </div>
+                <div class="autocomplete-dropdown" id="dealer-dropdown" style="top: 100%; border-radius: 12px; margin-top: 4px;"></div>
+            </div>
+            <div class="premium-dealer-input" style="margin-top: -10px; margin-bottom: 24px;">
+                <label>Attach Bill Slip / Photo (Optional)</label>
+                <div class="p-input-box">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    <input type="file" id="d-slip-upload" accept="image/*" style="font-size: 14px; padding: 4px 0;">
+                </div>
+            </div>
+            <div class="search-container" style="z-index: 20;">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" class="search-box" id="d-search" placeholder="Search material..." autocomplete="off" onkeyup="handleSearch('dispatch', this.value)">
+                </div>
+                <div class="autocomplete-dropdown" id="d-dropdown"></div>
+            </div>
+            <div class="config-card" id="d-config">
+                <h4 class="selected-item-title" id="d-selected-name">Item Name</h4>
+                <div class="input-row">
+                    <div class="input-wrapper"><label>Rate (₹)</label><input type="number" id="d-rate" step="0.01" onfocus="handleInputFocus(this)"><span class="unit-label">/ <span id="d-unit-lbl-1">kg</span></span></div>
+                    <div class="input-wrapper"><label>Quantity</label><input type="number" id="d-qty" step="0.01" onfocus="handleInputFocus(this)"><span class="unit-label" id="d-unit-lbl-2">kg</span></div>
+                </div>
+                <button class="btn-add-cart btn-add-dispatch" onclick="addToCart('dispatch')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Add to Bill</button>
+            </div>
+            <div class="cart-list" id="d-cart-list"></div>
+        </div>
+        <div class="screen-footer">
+            <div class="total-row"><span class="total-label">Total Amount</span><span class="total-amount">₹<span id="d-total">0</span></span></div>
+            <button class="btn-execute btn-execute-dispatch" onclick="generateInvoice()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><polyline points="9 15 12 18 15 15"></polyline></svg> Generate Bill
+            </button>
+        </div>
+    </div>
+    <div id="screen-dealer-detail" class="app-screen">
+        <div class="screen-header">
+            <button class="back-btn" onclick="closeAppScreen('dealer-detail')"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button>
+            <h2 class="screen-title" id="dd-title">Dealer Name</h2>
+        </div>
+        
+        <div class="screen-content">
+            
+            <div class="dealer-header-premium">
+                <div class="dh-title">
+                    <div class="dh-avatar" id="dd-header-avatar">D</div>
+                    <span id="dd-header-name" style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Dealer Name</span>
+                </div>
+                <div class="dh-kpi-grid">
+                    <div class="dh-kpi">
+                        <div class="dh-kpi-label" style="color: #10B981;">Total Paid</div>
+                        <div class="dh-kpi-val" id="dd-kpi-paid">₹0</div>
+                    </div>
+                    <div class="dh-kpi">
+                        <div class="dh-kpi-label" style="color: #ffffff; opacity:0.9;">Total Due</div>
+                        <div class="dh-kpi-val" id="dd-kpi-due">₹0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-tabs">
+                <div class="filter-tab active" onclick="setDealerStatusFilter('all', this)">All History</div>
+                <div class="filter-tab" onclick="setDealerStatusFilter('paid', this)">Paid</div>
+                <div class="filter-tab" onclick="setDealerStatusFilter('due', this)">Pending</div>
+            </div>
+            <div class="analysis-top-wrapper">
+                <div class="custom-dropdown-wrapper" style="width:100%;">
+                    <button class="sort-btn" id="dealerDetailSortBtn" style="width: 100%; border: 1px solid #CBD5E1; color: #334155;">
+                        <span id="dealerDetailSortBtnText">This Month</span><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="custom-menu" id="dealerDetailCustomMenu" style="width:100%;">
+                        <label class="dropdown-item"><span class="item-text">This Month</span><input type="radio" name="dealerDetailFilter" value="This Month" checked><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">Last 2 Months</span><input type="radio" name="dealerDetailFilter" value="Last 2 Months"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">Last 3 Months</span><input type="radio" name="dealerDetailFilter" value="Last 3 Months"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text">1 Year</span><input type="radio" name="dealerDetailFilter" value="1 Year"><span class="custom-radio"></span></label>
+                        <label class="dropdown-item"><span class="item-text" id="dealerDetail-custom-month">Custom Month Range</span><input type="radio" name="dealerDetailFilter" value="Custom Month Range"><span class="custom-radio"></span></label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="txn-list" id="dd-txn-list"></div>
+        </div>
+    </div>
+    <div id="screen-add-item" class="app-screen">
+        <div class="screen-header">
+            <button class="back-btn" onclick="closeAppScreen('add-item')"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button>
+            <h2 class="screen-title">Add / Update Material</h2>
+        </div>
+        <div class="screen-content">
+            <div class="premium-dealer-input">
+                <label>Material Name <span style="color:#EF4444">*</span></label>
+                <div class="p-input-box" style="margin-bottom:16px;">
+                    <svg viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
+                    <input type="text" id="new-item-name" placeholder="e.g. Iron Scrap...">
+                </div>
+                <div class="input-row">
+                    <div class="input-field" style="flex:1;"><label>Default Rate (₹)</label><input type="number" id="new-item-rate" placeholder="0.00" step="0.01"></div>
+                    <div class="input-field" style="flex:1;">
+                        <label>Unit</label>
+                        <select id="new-item-unit"><option value="kg">kg</option><option value="pic">pic</option></select>
+                    </div>
+                </div>
+                <div class="input-field" style="margin-top:16px;">
+                    <label>Category Type</label>
+                    <select id="new-item-type"><option value="metal">Metal</option><option value="plastic">Plastic</option><option value="paper">Paper / Cartoon</option></select>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 24px; padding-top: 16px; border-top: 1px dashed #E2E8F0;">
+                    <label style="margin-bottom:0; font-size: 13px; font-weight: 600; color: #334155;">List this item permanently?</label>
+                    <label class="switch"><input type="checkbox" id="new-item-permanent" checked><span class="slider round"></span></label>
+                </div>
+            </div>
+            <button class="btn-execute btn-execute-purchase" onclick="saveNewMaterial()" style="background:#10B981; margin-top:20px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Save Material
+            </button>
+        </div>
+    </div>
+    <div id="screen-item-analysis" class="app-screen">
+        <div class="screen-header">
+            <button class="back-btn" onclick="closeAppScreen('item-analysis')"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button>
+            <h2 class="screen-title" id="ia-title">Material Name</h2>
+        </div>
+        <div class="screen-content">
+            <div class="item-stat-grid" style="grid-template-columns: 1fr; margin-bottom: 16px;">
+                <div class="item-stat-card" style="background: linear-gradient(135deg, #0A1128 0%, #1a295c 100%); color: white; border: none; box-shadow: 0 8px 16px rgba(10,17,40,0.15);">
+                    <div class="item-stat-title" style="color: #94A3B8;">All-Time Available Stock</div>
+                    <div class="item-stat-qty" id="ia-current-stock-val" style="color: #ffffff; font-size: 28px;">0</div>
+                </div>
+            </div>
+            <div class="item-stat-grid">
+                <div class="item-stat-card">
+                    <div class="item-stat-title">Total Bought</div><div class="item-stat-qty" id="ia-bought-qty">0</div><div class="item-stat-amt out" id="ia-bought-amt">₹0.00</div>
+                </div>
+                <div class="item-stat-card">
+                    <div class="item-stat-title">Total Sold</div><div class="item-stat-qty" id="ia-sold-qty">0</div><div class="item-stat-amt in" id="ia-sold-amt">₹0.00</div>
+                </div>
+            </div>
+            <h3 style="font-size: 15px; color: #0A1128; margin-bottom: 12px;">Transaction History</h3>
+            <div class="txn-list" id="ia-history-list"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="markPaidModal">
+        <div class="range-modal" style="text-align: center; max-width: 380px; padding: 24px;">
+            <div style="display:flex; align-items:center; gap: 12px; margin-bottom: 16px;">
+                <div style="background: #ECFDF5; color: #10B981; width: 48px; height: 48px; border-radius: 12px; display:flex; align-items:center; justify-content:center;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div style="text-align: left;">
+                    <h3 class="modal-title" style="font-size:18px; margin: 0; color: #0F172A;">Payment Entry</h3>
+                    <p style="font-size: 12px; color: #64748B; margin: 0;">Select payment type</p>
+                </div>
+            </div>
+
+            <div id="markPaidDetails" style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:16px; text-align:left; margin-bottom: 20px;">
+            </div>
+
+            <div id="paymentTypeSelection" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+                <button onclick="executeFullPayment()" style="padding: 12px; border-radius: 12px; border: 2px solid #10B981; background: #ECFDF5; color: #065F46; font-weight: 600; font-family: 'Poppins'; cursor: pointer; transition: all 0.2s;">Full Paid</button>
+                <button onclick="togglePartialPayment()" style="padding: 12px; border-radius: 12px; border: 2px solid #CBD5E1; background: #ffffff; color: #334155; font-weight: 600; font-family: 'Poppins'; cursor: pointer; transition: all 0.2s;">Partial Paid</button>
+            </div>
+
+            <div id="partialPaymentSection" style="display: none; background: transparent; border: none; padding: 0; margin: 0 0 24px 0;">
+                <div style="display:flex; justify-content:flex-start; align-items:center; margin-bottom: 8px;">
+                    <label style="font-size:12px; font-weight:600; color:#334155; text-transform:uppercase;">Enter Amount</label>
+                </div>
+                <div class="payment-input-wrap" style="margin-top:0; border: 2px solid #E2E8F0; padding: 14px 16px;">
+                    <span style="color: #0F172A;">₹</span>
+                    <input type="number" id="payAmountInput" step="0.01" placeholder="0.00" style="color: #0F172A; font-size: 22px;">
+                </div>
+            </div>
+
+            <div class="modal-actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%;">
+                <button class="btn-cancel" style="padding: 14px; font-size:14px; background:#F1F5F9; color:#64748B; border-radius: 12px; width: 100%;" onclick="closePaymentModal()">Cancel</button>
+                <button class="btn-apply" id="savePaymentBtn" style="display:none; padding: 14px; font-size: 14px; background: #0A1128; color: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(10,17,40,0.15); width: 100%;" onclick="savePartialPayment()">Save Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="resetModal">
+        <div class="range-modal" style="text-align: center;">
+            <div style="display:flex; justify-content:center; margin-bottom: 16px;">
+                <div style="background: #FEF2F2; color: #EF4444; width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                </div>
+            </div>
+            <h3 class="modal-title" style="font-size:20px;">Reset All Data?</h3>
+            <p style="font-size: 13px; color: #64748B; margin-bottom: 24px;">This action is completely irreversible.</p>
+            <div class="modal-actions" style="justify-content: center; width: 100%; gap: 12px;">
+                <button class="btn-cancel" style="flex:1; padding: 12px;" onclick="document.getElementById('resetModal').classList.remove('show')">Cancel</button>
+                <button class="btn-apply" style="flex:1; background: #EF4444; box-shadow: 0 4px 10px rgba(239,68,68,0.2); padding: 12px;" onclick="confirmResetData()">Yes, Reset</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="rangeModal">
+        <div class="range-modal">
+            <h3 class="modal-title" id="modalTitle">Select Range</h3>
+            <div class="input-group">
+                <div class="input-field"><label>From</label><input type="date" id="rangeFrom"></div>
+                <div class="input-field"><label>To</label><input type="date" id="rangeTo"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="cancelRange()">Cancel</button>
+                <button class="btn-apply" onclick="applyRange()">Apply</button>
+            </div>
+        </div>
+    </div>
+    <div class="invoice-overlay" id="invoiceOverlay">
+        <div class="invoice-actions">
+            <button onclick="closeInvoice()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back</button>
+            <button onclick="printInvoice()" style="background: #10B981; color: #fff; border:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg> Print / Download</button>
+        </div>
+        <div class="invoice-scroll">
+            <div class="invoice-paper" id="invoicePrintArea">
+                <div class="inv-header">
+                    <h1 class="inv-title">SARKAR ENTERPRISES</h1>
+                    <p class="inv-sub">PROP: RAJU SARKAR | INFRONT OF 1 GP JALPAIGURI | BANARHAT</p>
+                    <p class="inv-sub">CONTACT: 8942010182 / 8145828413</p>
+                    <p class="inv-sub">DEALS WITH ALL SCRAP ITEMS AND OLD MACHINERIES</p>
+                    <p class="inv-sub">EMAIL: RAJUSARKAR4141@GMAIL.COM</p>
+                </div>
+                <div class="inv-meta">
+                    <div>TO:<br><span id="inv-dealer-name" style="font-weight: normal;"></span></div>
+                    <div style="text-align: right;">DATE: <span id="inv-date" style="font-weight: normal;"></span><br>INVOICE #: <span id="inv-invoice-num" style="font-weight: normal;"></span></div>
+                </div>
+                <table class="inv-table">
+                    <thead><tr><th>QTY</th><th>DESCRIPTION</th><th>UNIT</th><th class="text-right">PRICE (₹)</th><th class="text-right">LINE TOTAL (₹)</th></tr></thead>
+                    <tbody id="inv-table-body"></tbody>
+                </table>
+                <div class="inv-total" id="inv-grand-total">TOTAL: ₹0.00</div>
+                <div class="inv-footer">WISHING A GREAT DEAL WITH US AND STAY CONNECTED TO US FOR NEXT DEAL. Thank you for your business!</div>
+                <div id="inv-slip-container" style="display:none; text-align:center; margin-top:30px; border-top: 2px dashed #ccc; padding-top: 20px;">
+                    <h3 style="margin-bottom: 15px; color: #333; font-size: 16px;">Attached Slip</h3>
+                    <img id="inv-slip-img" style="max-width:100%; border:1px solid #ddd; border-radius:8px;" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // -----------------------------
+        // PREMIUM TOAST SYSTEM
+        // -----------------------------
+        function showToast(message, type="success") {
+            const toast = document.getElementById('premium-toast');
+            const msgEl = document.getElementById('toast-msg');
+            const icon = type === 'error' ? '⚠️' : '✅';
+            if(type === 'error') toast.classList.add('error');
+            else toast.classList.remove('error');
+            msgEl.innerHTML = `${icon} ${message}`;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        // -----------------------------
+        // AUTHENTICATION LOGIC 
+        // -----------------------------
+        let authCreds = JSON.parse(localStorage.getItem('sarkar_auth')) || { id: "raju sarkar", pass: "rajusarkar123" };
+        function togglePasswordVisibility() {
+            const passInput = document.getElementById('loginPass');
+            const icon = document.getElementById('togglePass');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+            } else {
+                passInput.type = 'password';
+                icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+            }
+        }
+        function processLogin() {
+            const enteredId = document.getElementById('loginId').value.trim();
+            const enteredPass = document.getElementById('loginPass').value.trim();
+            if (enteredId === authCreds.id && enteredPass === authCreds.pass) {
+                localStorage.setItem('sarkar_isLoggedIn', 'true');
+                document.getElementById('login-screen').style.opacity = '0';
+                setTimeout(() => document.getElementById('login-screen').style.display = 'none', 400);
+            } else { document.getElementById('loginError').style.display = 'block'; }
+        }
+        function logoutApp() { localStorage.removeItem('sarkar_isLoggedIn'); window.location.reload(); }
+        // -----------------------------
+        // SETTINGS & DATA LOGIC
+        // -----------------------------
+        function saveNewCredentials() {
+            const newId = document.getElementById('newCredId').value.trim();
+            const newPass = document.getElementById('newCredPass').value.trim();
+            if (newId && newPass) {
+                authCreds = { id: newId, pass: newPass };
+                localStorage.setItem('sarkar_auth', JSON.stringify(authCreds));
+                showToast("Credentials updated successfully!");
+                document.getElementById('newCredId').value = '';
+                document.getElementById('newCredPass').value = '';
+                document.getElementById('changeCredsForm').style.display = 'none';
+            } else { showToast("Please fill both ID and Password", "error"); }
+        }
+        function exportData() {
+            const data = { db: localStorage.getItem('sarkar_scrap_db'), txns: localStorage.getItem('sarkar_txns'), auth: localStorage.getItem('sarkar_auth') };
+            const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = `Sarkar_Backup_${new Date().getTime()}.json`; a.click();
+        }
+        function processImport(event) {
+            const file = event.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if(data.db) localStorage.setItem('sarkar_scrap_db', data.db);
+                    if(data.txns) localStorage.setItem('sarkar_txns', data.txns);
+                    if(data.auth) localStorage.setItem('sarkar_auth', data.auth);
+                    showToast("Data imported successfully!"); setTimeout(() => window.location.reload(), 1500);
+                } catch (err) { showToast("Invalid backup file.", "error"); }
+            };
+            reader.readAsText(file); event.target.value = ''; 
+        }
+        function confirmResetData() {
+            localStorage.removeItem('sarkar_scrap_db'); localStorage.removeItem('sarkar_txns');
+            showToast("App has been reset to factory defaults."); setTimeout(() => window.location.reload(), 1500);
+        }
+        // -----------------------------
+        // NATIVE NAVIGATION LOGIC
+        // -----------------------------
+        let currentActiveTab = 'home';
+        let isModalOpen = false;
+        let globalDealerTab = 'due';
+        function setGlobalDealerTab(tab, element) {
+            globalDealerTab = tab;
+            document.querySelectorAll('.d-tab').forEach(t => t.classList.remove('active'));
+            element.classList.add('active');
+            renderDealers();
+        }
+        window.history.replaceState({ tab: 'home' }, '');
+        function switchTabCore(tabId, element) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if(element) element.classList.add('active');
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('section-' + tabId).classList.add('active');
+            
+            if(tabId === 'analysis') renderAnalysisItems(document.getElementById('a-search').value);
+            else if (tabId === 'transaction') renderTransactions();
+            else if (tabId === 'home') renderHome();
+            else if (tabId === 'dealers') renderDealers();
+        }
+        function switchTab(tabId, element) {
+            if (tabId === currentActiveTab) return; 
+            if (tabId === 'home') {
+                if (window.history.state && window.history.state.tab !== 'home') { window.history.back(); return; }
+            } else {
+                if (currentActiveTab === 'home') window.history.pushState({ tab: tabId }, '');
+                else window.history.replaceState({ tab: tabId }, '');
+            }
+            currentActiveTab = tabId;
+            switchTabCore(tabId, element);
+        }
+        function openAppScreen(type) {
+            window.history.pushState({ screen: type }, '');
+            isModalOpen = true;
+            document.getElementById(`screen-${type}`).classList.add('active');
+            document.body.style.overflow = 'hidden'; 
+        }
+        function closeAppScreen(type) {
+            if (window.history.state && window.history.state.screen === type) {
+                window.history.back();
+            } else {
+                closeAppScreenCore(type);
+            }
+        }
+        function closeAppScreenCore(type) {
+            isModalOpen = false;
+            document.getElementById(`screen-${type}`).classList.remove('active');
+            const searchBox = document.getElementById(`${type[0]}-search`);
+            if(searchBox) searchBox.value = '';
+            const configBox = document.getElementById(`${type[0]}-config`);
+            if(configBox) configBox.classList.remove('show');
+            if(activeItems[type] !== undefined) activeItems[type] = null;
+            if(type === 'item-analysis') currentAnalysisItemId = null;
+            if(type === 'dealer-detail') currentDealerName = null;
+            if(type === 'add-item') {
+                document.getElementById('new-item-name').value = '';
+                document.getElementById('new-item-rate').value = '';
+                document.getElementById('new-item-permanent').checked = true;
+                pendingAutoSelectName = null; pendingAutoSelectSource = null;
+            }
+            if (document.querySelectorAll('.app-screen.active').length === 0) document.body.style.overflow = '';
+        }
+        window.addEventListener('popstate', (e) => {
+            if (document.body.classList.contains('search-active')) {
+                document.body.classList.remove('search-active');
+                if (document.getElementById('a-search')) document.getElementById('a-search').value = '';
+                if (document.getElementById('dealer-main-search')) {
+                    document.getElementById('dealer-main-search').value = '';
+                    document.getElementById('dealer-main-dropdown').classList.remove('show');
+                }
+                renderAnalysisItems();
+                renderDealers();
+                if (e.state && e.state.tab) switchTabCore(e.state.tab, document.querySelector(`[onclick="switchTab('${e.state.tab}', this)"]`));
+                return;
+            }
+            const targetScreen = e.state ? e.state.screen : null;
+            document.querySelectorAll('.app-screen.active').forEach(s => {
+                const type = s.id.replace('screen-', '');
+                if (type !== targetScreen) closeAppScreenCore(type);
+            });
+            if (targetScreen) {
+                document.getElementById(`screen-${targetScreen}`).classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else if (e.state && e.state.tab) {
+                switchTabCore(e.state.tab, document.querySelector(`[onclick="switchTab('${e.state.tab}', this)"]`));
+                currentActiveTab = e.state.tab;
+            } else {
+                switchTabCore('home', document.querySelector('.nav-item'));
+                currentActiveTab = 'home';
+            }
+        });
+        // -----------------------------
+        // RANDOM GREETING
+        // -----------------------------
+        function changeGreeting() {
+            const premiumGreetings = [
+                { main: "Hey <span class='name-highlight'>Raju</span>", sub: "Here's your latest overview" },
+                { main: "Welcome back, <span class='name-highlight'>Raju</span>", sub: "Ready to make some trades?" },
+                { main: "Good day, <span class='name-highlight'>Raju</span>", sub: "Let's check today's numbers" },
+                { main: "Hello, <span class='name-highlight'>Raju</span>", sub: "Your dashboard is up to date" }
+            ];
+            const rd = premiumGreetings[Math.floor(Math.random() * premiumGreetings.length)];
+            document.getElementById('greetingMessage').innerHTML = `${rd.main} <span class="waving-hand">👋</span>`;
+            document.getElementById('greetingSub').innerText = rd.sub;
+        }
+        changeGreeting();
+        // -----------------------------
+        // INDEPENDENT SORTING & FILTER LOGIC
+        // -----------------------------
+        const sortBtns = [
+            document.getElementById('sortBtn'), 
+            document.getElementById('txnSortBtn'), 
+            document.getElementById('analysisSortBtn'),
+            document.getElementById('dealerDetailSortBtn') // index 3
+        ];
+        const customMenus = [
+            document.getElementById('customMenu'), 
+            document.getElementById('txnCustomMenu'), 
+            document.getElementById('analysisCustomMenu'),
+            document.getElementById('dealerDetailCustomMenu')
+        ];
+        const sortBtnTexts = [
+            document.getElementById('sortBtnText'), 
+            document.getElementById('txnSortBtnText'), 
+            document.getElementById('analysisSortBtnText'),
+            document.getElementById('dealerDetailSortBtnText')
+        ];
+        const radioInputs = document.querySelectorAll('.dropdown-item input[type="radio"]');
+        const rangeModal = document.getElementById('rangeModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const rangeFrom = document.getElementById('rangeFrom');
+        const rangeTo = document.getElementById('rangeTo');
+        let currentMode = "date"; 
+        let activeSortMenuIndex = 0; 
+        
+        // Independent Filter Objects
+        let filters = {
+            0: { type: 'Today', from: null, to: null },       // Home
+            1: { type: 'Today', from: null, to: null },       // Txn
+            2: { type: 'Today', from: null, to: null },       // Analysis
+            3: { type: 'This Month', from: null, to: null }   // Dealer Detail
+        };
+        let currentDealerName = null;
+        let currentDealerStatusFilter = 'all';
+        sortBtns.forEach((btn, index) => {
+            if(!btn) return;
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                activeSortMenuIndex = index;
+                customMenus[index].classList.toggle('show');
+                btn.classList.toggle('active');
+            });
+        });
+        function forceRecount() {
+            if(document.getElementById('section-home').classList.contains('active')) {
+                document.getElementById('hero-val-span').innerText = '0'; document.getElementById('card-gross-val').innerText = '0';
+                document.getElementById('card-profit-val').innerText = '0'; document.getElementById('card-purchases-val').innerText = '0';
+                document.getElementById('card-handled-val').innerText = '0';
+            }
+        }
+        radioInputs.forEach(input => {
+            input.addEventListener('click', function(e) {
+                if (this.value === "Custom Date Range" || this.value === "Custom Month Range") {
+                    currentMode = this.value === "Custom Date Range" ? "date" : "month";
+                    modalTitle.innerText = this.value === "Custom Date Range" ? "Select Date Range" : "Select Month Range";
+                    rangeFrom.type = currentMode; rangeTo.type = currentMode;
+                    
+                    const today = new Date();
+                    const yyyy = today.getFullYear(); const mm = String(today.getMonth() + 1).padStart(2, '0'); const dd = String(today.getDate()).padStart(2, '0');
+                    
+                    rangeFrom.max = currentMode === 'date' ? `${yyyy}-${mm}-${dd}` : `${yyyy}-${mm}`;
+                    rangeTo.max = currentMode === 'date' ? `${yyyy}-${mm}-${dd}` : `${yyyy}-${mm}`;
+                    rangeFrom.value = ""; rangeTo.value = "";
+                    
+                    rangeModal.classList.add('show');
+                    customMenus.forEach(menu => {if(menu) menu.classList.remove('show')});
+                    sortBtns.forEach(btn => {if(btn) btn.classList.remove('active')});
+                }
+            });
+            input.addEventListener('change', function() {
+                if(this.checked && this.value !== "Custom Date Range" && this.value !== "Custom Month Range") {
+                    sortBtnTexts[activeSortMenuIndex].textContent = this.value;
+                    filters[activeSortMenuIndex] = { type: this.value, from: null, to: null };
+                    customMenus.forEach(menu => {if(menu) menu.classList.remove('show')});
+                    sortBtns.forEach(btn => {if(btn) btn.classList.remove('active')});
+                    forceRecount(); refreshCurrentView();
+                }
+            });
+        });
+        function formatValue(val, type) {
+            const d = new Date(val);
+            return type === 'date' 
+                ? d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' })
+                : d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+        }
+        function applyRange() {
+            if (!rangeFrom.value || !rangeTo.value) { showToast("Please select both ranges.", "error"); return; }
+            const formattedFrom = formatValue(rangeFrom.value, currentMode);
+            const formattedTo = formatValue(rangeTo.value, currentMode);
+            sortBtnTexts[activeSortMenuIndex].textContent = `${formattedFrom} - ${formattedTo}`;
+            
+            let labelId = 'label-custom-date';
+            if (activeSortMenuIndex === 0) labelId = currentMode === 'date' ? 'label-custom-date' : 'label-custom-month';
+            if (activeSortMenuIndex === 1) labelId = currentMode === 'date' ? 'txn-label-custom-date' : 'txn-label-custom-month';
+            if (activeSortMenuIndex === 2) labelId = currentMode === 'date' ? 'ana-label-custom-date' : 'ana-label-custom-month';
+            if (activeSortMenuIndex === 3) labelId = 'dealerDetail-custom-month';
+            
+            const targetLabel = document.getElementById(labelId);
+            if(targetLabel) targetLabel.textContent = `${formattedFrom} - ${formattedTo}`;
+            let fromDate, toDate;
+            if (currentMode === "date") {
+                const [fY, fM, fD] = rangeFrom.value.split('-'); const [tY, tM, tD] = rangeTo.value.split('-');
+                fromDate = new Date(fY, fM - 1, fD, 0, 0, 0, 0); toDate = new Date(tY, tM - 1, tD, 23, 59, 59, 999);
+            } else {
+                const [fY, fM] = rangeFrom.value.split('-'); const [tY, tM] = rangeTo.value.split('-');
+                fromDate = new Date(fY, fM - 1, 1, 0, 0, 0, 0); toDate = new Date(tY, tM, 0, 23, 59, 59, 999);
+            }
+            filters[activeSortMenuIndex] = { type: currentMode === "date" ? "Custom Date Range" : "Custom Month Range", from: fromDate, to: toDate };
+            rangeModal.classList.remove('show');
+            forceRecount(); refreshCurrentView();
+        }
+        function refreshCurrentView() {
+            if(document.getElementById('screen-item-analysis').classList.contains('active') && currentAnalysisItemId) renderItemAnalysis(currentAnalysisItemId);
+            else if(document.getElementById('screen-dealer-detail').classList.contains('active') && currentDealerName) renderDealerDetailTransactions();
+            else if (document.getElementById('section-transaction').classList.contains('active')) renderTransactions();
+            else if (document.getElementById('section-analysis').classList.contains('active')) renderAnalysisItems(document.getElementById('a-search').value);
+            else if (document.getElementById('section-dealers').classList.contains('active')) renderDealers();
+            else if (document.getElementById('section-home').classList.contains('active')) renderHome();
+        }
+        function cancelRange() { rangeModal.classList.remove('show'); }
+        document.addEventListener('click', (e) => {
+            let isOutside = true;
+            sortBtns.forEach(btn => { if(btn && btn.contains(e.target)) isOutside = false; });
+            customMenus.forEach(menu => { if(menu && menu.contains(e.target)) isOutside = false; });
+            if(rangeModal.contains(e.target) || document.getElementById('resetModal').contains(e.target) || document.getElementById('markPaidModal').contains(e.target)) isOutside = false;
+            if (isOutside) { customMenus.forEach(menu => {if(menu) menu.classList.remove('show')}); sortBtns.forEach(btn => {if(btn) btn.classList.remove('active')}); }
+            if (e.target.id !== 'p-search' && document.getElementById('p-dropdown')) document.getElementById('p-dropdown').classList.remove('show');
+            if (e.target.id !== 'd-search' && document.getElementById('d-dropdown')) document.getElementById('d-dropdown').classList.remove('show');
+            if (e.target.id !== 'd-dealer-name' && document.getElementById('dealer-dropdown')) document.getElementById('dealer-dropdown').classList.remove('show');
+        });
+
+        // Dealer Search Input Specific Handlers
+        const dMainSearchInput = document.getElementById('dealer-main-search');
+        if(dMainSearchInput) {
+            dMainSearchInput.addEventListener('focus', () => {
+                if(!document.body.classList.contains('search-active')) {
+                    window.history.pushState({ searchActive: true, tab: 'dealers' }, '');
+                    document.body.classList.add('search-active');
+                }
+            });
+            dMainSearchInput.addEventListener('keyup', (e) => {
+                const query = e.target.value.toLowerCase();
+                const dropdown = document.getElementById('dealer-main-dropdown');
+                
+                if (query.trim() === '') {
+                    dropdown.classList.remove('show');
+                } else {
+                    const allDealers = [...new Set(transactionHistory.filter(t => t.type === 'dispatch' && t.dealer).map(t => t.dealer))];
+                    const matches = allDealers.filter(d => d.toLowerCase().includes(query));
+                    
+                    dropdown.innerHTML = '';
+                    matches.forEach(match => {
+                        const div = document.createElement('div');
+                        div.className = 'dropdown-item-premium';
+                        div.innerHTML = `<span class="item-name">${match}</span>`;
+                        div.onclick = () => {
+                            dMainSearchInput.value = match;
+                            dropdown.classList.remove('show');
+                            dMainSearchInput.blur();
+                            renderDealers();
+                        };
+                        dropdown.appendChild(div);
+                    });
+                    if (matches.length > 0) dropdown.classList.add('show');
+                    else dropdown.classList.remove('show');
+                }
+                
+                if (e.key === 'Enter') {
+                    e.target.blur();
+                    dropdown.classList.remove('show');
+                    renderDealers();
+                }
+            });
+        }
+        function closeDealerMainSearch() {
+            if(document.body.classList.contains('search-active')) window.history.back();
+        }
+
+        // -----------------------------
+        // DATABASE & STATE
+        // -----------------------------
+        const defaultScrapDatabase = [
+            { id: 1, name: "MS Iron", unit: "kg", rate: 28, type: "metal" },
+            { id: 2, name: "Burn Cast", unit: "kg", rate: 25, type: "metal" },
+            { id: 3, name: "Tina", unit: "kg", rate: 22, type: "metal" },
+            { id: 4, name: "Aluminium pipe", unit: "kg", rate: 180, type: "metal" },
+            { id: 5, name: "Plastic chemical containers (1,2,5,10)", unit: "kg", rate: 12, type: "plastic" },
+            { id: 6, name: "Waste paper Cartoon", unit: "kg", rate: 10, type: "paper" },
+            { id: 7, name: "1 lit Aluminium jar", unit: "pic", rate: 10, type: "metal" },
+            { id: 8, name: "5 lit Aluminium jar", unit: "pic", rate: 40, type: "metal" },
+            { id: 9, name: "Steel dust", unit: "kg", rate: 42, type: "metal" },
+            { id: 10, name: "20Lit chemical plastic jar", unit: "pic", rate: 70, type: "plastic" },
+            { id: 11, name: "50 Lit chemical plastic jar", unit: "pic", rate: 110, type: "plastic" },
+            { id: 12, name: "20 lit chemical Tina jar", unit: "pic", rate: 30, type: "plastic" },
+            { id: 13, name: "CTC segment", unit: "kg", rate: 64, type: "metal" },
+            { id: 14, name: "Tea plastic bag 30kg", unit: "pic", rate: 10, type: "plastic" },
+            { id: 15, name: "Tea plastic bag 25kg", unit: "pic", rate: 7, type: "plastic" }
+        ];
+        let scrapDatabase = JSON.parse(localStorage.getItem('sarkar_scrap_db')) || defaultScrapDatabase;
+        let carts = { purchase: [], dispatch: [] };
+        let activeItems = { purchase: null, dispatch: null };
+        let currentInvoiceId = "";
+        let currentAnalysisItemId = null;
+        let pendingAutoSelectName = null;
+        let pendingAutoSelectSource = null;
+        let transactionHistory = JSON.parse(localStorage.getItem('sarkar_txns')) || [];
+        const icons = {
+            metal: `<svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`, 
+            plastic: `<svg viewBox="0 0 24 24"><path d="M10 2v7.31"></path><path d="M14 9.3V1.99"></path><path d="M8.5 2h7"></path><path d="M14 9.3a4.7 4.7 0 0 1-1.7 9.27H8.26a4.65 4.65 0 0 1-4.04-2.66 4.75 4.75 0 0 1 1.04-5.32l1.65-1.57c.5-.47 1.34-1.12 1.34-2.22V2"></path><path d="M14 9.3v0a4.7 4.7 0 0 0 5.75 4.41c1.3-.34 2.25-1.55 2.25-2.92V9.3h-8z"></path></svg>`, 
+            paper: `<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>` 
+        };
+        // Migration logic for old data schema to partial payment schema
+        transactionHistory.forEach(txn => {
+            if(txn.type === 'dispatch' && txn.paidAmount === undefined) {
+                if(txn.paymentStatus === 'paid') txn.paidAmount = txn.total;
+                else txn.paidAmount = 0;
+            }
+        });
+        function getItemStock(baseId) {
+            let bought = 0; let sold = 0;
+            transactionHistory.forEach(txn => {
+                txn.items.forEach(item => {
+                    if (item.baseId === baseId) {
+                        if (txn.type === 'purchase') bought += item.qty;
+                        if (txn.type === 'dispatch') sold += item.qty;
+                    }
+                });
+            });
+            return bought - sold;
+        }
+        function animateValue(el, target, prefix = '', suffix = '') {
+            const duration = 1000; const start = parseInt(el.innerText.replace(/[^0-9-]/g, '')) || 0;
+            const diff = target - start; let startTime = null;
+            if(diff === 0) { el.innerText = prefix + target.toLocaleString('en-IN') + suffix; return; }
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const progress = Math.min((timestamp - startTime) / duration, 1);
+                const current = Math.floor(start + (diff * (1 - Math.pow(1 - progress, 5))));
+                el.innerText = prefix + current.toLocaleString('en-IN') + suffix;
+                if (progress < 1) window.requestAnimationFrame(step);
+                else el.innerText = prefix + target.toLocaleString('en-IN') + suffix;
+            }
+            window.requestAnimationFrame(step);
+        }
+        function updateCardTrend(elementId, currentValue, prevValue) {
+            const trendSpan = document.getElementById(elementId);
+            if (prevValue === 0) {
+                trendSpan.className = currentValue > 0 ? 'pc-trend trend-up' : 'pc-trend trend-neutral';
+                trendSpan.innerText = currentValue > 0 ? '↑ 100%' : '− 0%';
+            } else {
+                const percentChange = ((currentValue - prevValue) / prevValue) * 100;
+                if (percentChange > 0) { trendSpan.className = 'pc-trend trend-up'; trendSpan.innerText = `↑ ${percentChange.toFixed(1)}%`; } 
+                else if (percentChange < 0) { trendSpan.className = 'pc-trend trend-down'; trendSpan.innerText = `↓ ${Math.abs(percentChange).toFixed(1)}%`; } 
+                else { trendSpan.className = 'pc-trend trend-neutral'; trendSpan.innerText = `− 0%`; }
+            }
+        }
+        function getVsText(filterType) {
+            switch(filterType) {
+                case 'Today': return 'vs yest'; case 'Yesterday': return 'vs prev day'; case 'This Week': return 'vs last wk';
+                case 'This Month': return 'vs last mo'; case 'Last 2 Months': return 'vs prev 2mo'; case 'Last 3 Months': return 'vs prev 3mo';
+                case '1 Year': return 'vs last yr'; case 'Custom Date Range': case 'Custom Month Range': return 'vs prev pd'; default: return 'vs prev';
+            }
+        }
+        function getPreviousDateRange(filterObj) {
+            const now = new Date(); let from = new Date(0); let to = new Date(0);
+            if(filterObj.type === 'Today') { from = new Date(now); from.setDate(from.getDate() - 1); from.setHours(0,0,0,0); to = new Date(from); to.setHours(23,59,59,999); } 
+            else if(filterObj.type === 'Yesterday') { from = new Date(now); from.setDate(from.getDate() - 2); from.setHours(0,0,0,0); to = new Date(from); to.setHours(23,59,59,999); } 
+            else if(filterObj.type === 'This Week') { to = new Date(now); to.setDate(to.getDate() - to.getDay() - 1); to.setHours(23,59,59,999); from = new Date(to); from.setDate(from.getDate() - 6); from.setHours(0,0,0,0); } 
+            else if(filterObj.type === 'This Month') { from = new Date(now.getFullYear(), now.getMonth() - 1, 1); to = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999); } 
+            else if(filterObj.type === 'Last 2 Months') { from = new Date(now.getFullYear(), now.getMonth() - 3, 1); to = new Date(now.getFullYear(), now.getMonth() - 1, 0, 23, 59, 59, 999); } 
+            else if(filterObj.type === 'Last 3 Months') { from = new Date(now.getFullYear(), now.getMonth() - 5, 1); to = new Date(now.getFullYear(), now.getMonth() - 2, 0, 23, 59, 59, 999); } 
+            else if(filterObj.type === '1 Year') { from = new Date(now); from.setFullYear(from.getFullYear() - 2); to = new Date(now); to.setFullYear(to.getFullYear() - 1); } 
+            else if(filterObj.type === 'Custom Date Range' || filterObj.type === 'Custom Month Range') { const diff = filterObj.to.getTime() - filterObj.from.getTime(); to = new Date(filterObj.from.getTime() - 1); from = new Date(to.getTime() - diff); }
+            return { from, to };
+        }
+        // --- GLOBAL DATE CHECK ---
+        function isDateInActiveRange(dateStr, filterObj) {
+            const d = new Date(dateStr);
+            const type = filterObj.type;
+            const now = new Date();
+            
+            if(type === 'Today') return d.toDateString() === now.toDateString();
+            if(type === 'Yesterday') { const yest = new Date(now); yest.setDate(yest.getDate() - 1); return d.toDateString() === yest.toDateString(); }
+            if(type === 'This Week') { const firstDay = new Date(now); firstDay.setDate(now.getDate() - now.getDay()); firstDay.setHours(0,0,0,0); return d >= firstDay && d <= now; }
+            if(type === 'This Month') return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+            if(type === 'Last 2 Months') { const twoMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 1, 1); return d >= twoMonthsAgo && d <= now; }
+            if(type === 'Last 3 Months') { const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 2, 1); return d >= threeMonthsAgo && d <= now; }
+            if(type === '1 Year') { const oneYearAgo = new Date(now); oneYearAgo.setFullYear(now.getFullYear() - 1); return d >= oneYearAgo && d <= now; }
+            if(type === 'Custom Date Range' || type === 'Custom Month Range') {
+                if(!filterObj.from || !filterObj.to) return true;
+                return d.getTime() >= filterObj.from.getTime() && d.getTime() <= filterObj.to.getTime();
+            }
+            return true;
+        }
+        function renderHome() {
+            let totalStockValue = 0, totalPhysicalStock = 0;
+            scrapDatabase.forEach(item => {
+                const stock = getItemStock(item.id);
+                if (stock > 0) { totalPhysicalStock += stock; totalStockValue += (stock * item.rate); }
+            });
+            animateValue(document.getElementById('hero-val-span'), totalStockValue, '₹');
+            document.getElementById('hero-stock-span').innerText = `Physical Stock: ${totalPhysicalStock.toLocaleString('en-IN')} Units`;
+            const currentTxns = transactionHistory.filter(txn => isDateInActiveRange(txn.date, filters[0]));
+            let grossRevenue = 0, localPurchases = 0, materialHandled = 0, netProfit = 0;
+            currentTxns.forEach(txn => {
+                if (txn.type === 'purchase') { localPurchases += txn.total; txn.items.forEach(i => materialHandled += i.qty); } 
+                else if (txn.type === 'dispatch') {
+                    grossRevenue += txn.total;
+                    txn.items.forEach(i => { materialHandled += i.qty; const baseItem = scrapDatabase.find(dbItem => dbItem.id === i.baseId);
+                        const buyRate = baseItem ? baseItem.rate : (i.buyRate || 0); netProfit += (i.total - (i.qty * buyRate)); });
+                }
+            });
+            const prevRange = getPreviousDateRange(filters[0]);
+            const prevTxns = transactionHistory.filter(txn => { const d = new Date(txn.date); return d >= prevRange.from && d <= prevRange.to; });
+            let prevGross = 0, prevPurchases = 0, prevHandled = 0, prevProfit = 0;
+            prevTxns.forEach(txn => {
+                 if (txn.type === 'purchase') { prevPurchases += txn.total; txn.items.forEach(i => prevHandled += i.qty); } 
+                 else if (txn.type === 'dispatch') { prevGross += txn.total; txn.items.forEach(i => {
+                        prevHandled += i.qty; const baseItem = scrapDatabase.find(dbItem => dbItem.id === i.baseId);
+                        const buyRate = baseItem ? baseItem.rate : (i.buyRate || 0); prevProfit += (i.total - (i.qty * buyRate)); }); }
+            });
+            const vsTextObj = getVsText(filters[0].type);
+            document.getElementById('card-gross-vs').innerText = vsTextObj; document.getElementById('card-profit-vs').innerText = vsTextObj;
+            document.getElementById('card-purchases-vs').innerText = vsTextObj; document.getElementById('card-handled-vs').innerText = vsTextObj;
+            animateValue(document.getElementById('card-gross-val'), grossRevenue, '₹'); updateCardTrend('card-gross-trend', grossRevenue, prevGross);
+            animateValue(document.getElementById('card-profit-val'), netProfit, '₹'); updateCardTrend('card-profit-trend', netProfit, prevProfit);
+            animateValue(document.getElementById('card-purchases-val'), localPurchases, '₹'); updateCardTrend('card-purchases-trend', localPurchases, prevPurchases);
+            animateValue(document.getElementById('card-handled-val'), materialHandled, ''); updateCardTrend('card-handled-trend', materialHandled, prevHandled);
+        }
+        function handleDealerSearch(query) {
+            const dropdown = document.getElementById(`dealer-dropdown`);
+            if (query.trim() === '') { dropdown.classList.remove('show'); return; }
+            
+            // Extract Unique Dealers from History
+            const uniqueDealers = [...new Set(transactionHistory.filter(t => t.type === 'dispatch' && t.dealer).map(t => t.dealer))];
+            const terms = query.toLowerCase().split(' ').filter(t => t);
+            const results = uniqueDealers.filter(d => terms.every(term => d.toLowerCase().includes(term)));
+            dropdown.innerHTML = '';
+            
+            if (results.length > 0) {
+                results.forEach(d => {
+                    const div = document.createElement('div');
+                    div.className = 'dropdown-item-premium';
+                    div.innerHTML = `<div class="item-info-left"><span class="item-name">${d}</span></div>`;
+                    div.onclick = () => {
+                        document.getElementById('d-dealer-name').value = d;
+                        dropdown.classList.remove('show');
+                    };
+                    dropdown.appendChild(div);
+                });
+            }
+            
+            // Allow exact entry addition
+            const addBtn = document.createElement('div');
+            addBtn.className = 'dropdown-item-premium';
+            addBtn.style = "justify-content:center; color:#10B981; font-weight:600; border-top: 1px solid #E2E8F0; background: #F8FAFC;";
+            addBtn.innerHTML = `Use "${query}"`;
+            addBtn.onclick = () => {
+                document.getElementById('d-dealer-name').value = query;
+                dropdown.classList.remove('show');
+            };
+            dropdown.appendChild(addBtn);
+            dropdown.classList.add('show');
+        }
+        function handleSearch(type, query) {
+            const prefix = type[0]; const dropdown = document.getElementById(`${prefix}-dropdown`);
+            if(!dropdown) return;
+            if (query.trim() === '') { dropdown.classList.remove('show'); return; }
+            const terms = query.toLowerCase().split(' ').filter(t => t);
+            const results = scrapDatabase.filter(item => { const name = item.name.toLowerCase(); return terms.every(term => name.includes(term)); });
+            dropdown.innerHTML = '';
+            if (results.length > 0) {
+                results.forEach(item => {
+                    const div = document.createElement('div'); div.className = 'dropdown-item-premium';
+                    div.innerHTML = `<div class="item-info-left"><div class="item-icon-box icon-${item.type}">${icons[item.type]}</div><span class="item-name">${item.name}</span></div><span class="item-rate-badge">₹${item.rate}/${item.unit}</span>`;
+                    div.onclick = () => selectItem(type, item);
+                    dropdown.appendChild(div);
+                });
+            }
+            
+            if (type === 'purchase') {
+                const addBtn = document.createElement('div'); addBtn.className = 'dropdown-item-premium';
+                addBtn.style = "justify-content:center; color:#10B981; font-weight:600; border-top: 1px solid #E2E8F0; background: #F8FAFC;";
+                addBtn.innerHTML = `+ Add "${query}" as New Item`;
+                addBtn.onclick = () => {
+                    dropdown.classList.remove('show');
+                    document.getElementById('new-item-name').value = query; pendingAutoSelectName = query; pendingAutoSelectSource = type; 
+                    openAppScreen('add-item');
+                };
+                dropdown.appendChild(addBtn); dropdown.classList.add('show');
+            } else {
+                if (results.length > 0) dropdown.classList.add('show'); else dropdown.classList.remove('show');
+            }
+        }
+        function handleInputFocus(element) { setTimeout(() => { const card = element.closest('.config-card'); if (card) card.scrollIntoView({ behavior: 'smooth', block: 'end' }); }, 300); }
+        function selectItem(type, item) {
+            const prefix = type[0]; activeItems[type] = { ...item }; 
+            const searchBox = document.getElementById(`${prefix}-search`); searchBox.value = item.name; searchBox.blur(); 
+            document.getElementById(`${prefix}-dropdown`).classList.remove('show');
+            const config = document.getElementById(`${prefix}-config`);
+            document.getElementById(`${prefix}-selected-name`).innerText = item.name;
+            document.getElementById(`${prefix}-rate`).value = item.rate; document.getElementById(`${prefix}-qty`).value = ''; 
+            document.getElementById(`${prefix}-unit-lbl-1`).innerText = item.unit; document.getElementById(`${prefix}-unit-lbl-2`).innerText = item.unit;
+            config.classList.add('show'); setTimeout(() => { config.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+        function addToCart(type) {
+            const prefix = type[0]; const item = activeItems[type]; if (!item) return;
+            const rate = parseFloat(document.getElementById(`${prefix}-rate`).value); const qty = parseFloat(document.getElementById(`${prefix}-qty`).value);
+            if (!rate || !qty || qty <= 0) { showToast("Please enter a valid quantity and rate.", "error"); return; }
+            if (type === 'dispatch') {
+                const currentStock = getItemStock(item.id);
+                const alreadyInCart = carts.dispatch.filter(i => i.baseId === item.id).reduce((sum, i) => sum + i.qty, 0);
+                if (qty + alreadyInCart > currentStock) { showToast(`Insufficient stock! You only have ${currentStock - alreadyInCart} ${item.unit} available.`, "error"); return; }
+            }
+            carts[type].push({ ...item, appliedRate: rate, buyRate: item.rate, qty: qty, total: rate * qty, id: Date.now(), baseId: item.id });
+            document.getElementById(`${prefix}-search`).value = ''; document.getElementById(`${prefix}-config`).classList.remove('show'); activeItems[type] = null;
+            renderCart(type);
+        }
+        function removeFromCart(type, id) { carts[type] = carts[type].filter(item => item.id !== id); renderCart(type); }
+        function renderCart(type) {
+            const prefix = type[0]; const listElement = document.getElementById(`${prefix}-cart-list`); const totalElement = document.getElementById(`${prefix}-total`);
+            listElement.innerHTML = ''; let grandTotal = 0;
+            carts[type].forEach(item => {
+                grandTotal += item.total; const div = document.createElement('div'); div.className = 'cart-item';
+                div.innerHTML = `
+                    <div class="cart-item-details"><h4 class="cart-item-name">${item.name}</h4><p class="cart-item-calc">${item.qty} ${item.unit} × ₹${item.appliedRate}</p></div>
+                    <div class="cart-item-right"><span class="cart-item-total">₹${item.total.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits:2})}</span>
+                    <button class="btn-remove" onclick="removeFromCart('${type}', ${item.id})"><svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></div>`;
+                listElement.appendChild(div);
+            });
+            totalElement.innerText = grandTotal.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits:2});
+        }
+        function executeAction(type) {
+            if (carts[type].length === 0) { showToast("Cart is empty.", "error"); return; }
+            let total = 0; carts[type].forEach(item => total += item.total);
+            let dealer = "Local Vendor"; let paidAmt = 0;
+            if (type === 'dispatch') {
+                const dealerNameInput = document.getElementById('d-dealer-name');
+                dealer = dealerNameInput.value.trim() || "Dealer";
+            }
+            let invNumToSave = type === 'dispatch' ? (currentInvoiceId || ('INV-' + Math.floor(100000 + Math.random() * 900000))) : ('PUR-' + Math.floor(100000 + Math.random() * 900000));
+            const txn = { id: Date.now(), invoice: invNumToSave, type: type, dealer: dealer, paidAmount: type==='dispatch'? 0 : total, items: [...carts[type]], total: total, date: new Date().toISOString() };
+            transactionHistory.unshift(txn); localStorage.setItem('sarkar_txns', JSON.stringify(transactionHistory));
+            if(type === 'dispatch') {
+                let dbChanged = false;
+                scrapDatabase = scrapDatabase.filter(item => {
+                    if(item.temp) { if(getItemStock(item.id) <= 0) { dbChanged = true; return false; } } return true;
+                });
+                if(dbChanged) { localStorage.setItem('sarkar_scrap_db', JSON.stringify(scrapDatabase)); renderAnalysisItems(); }
+            }
+            showToast("Action Executed Successfully!"); carts[type] = []; renderCart(type);
+            if(type === 'dispatch'){ document.getElementById('d-dealer-name').value = ''; const slipInput = document.getElementById('d-slip-upload'); if(slipInput) slipInput.value = ''; currentInvoiceId = ""; }
+            closeAppScreenCore(type); if(window.history.state && window.history.state.screen === type) window.history.back();
+            refreshCurrentView();
+        }
+        function renderTransactions() {
+            const list = document.getElementById('transaction-list'); if(!list) return; list.innerHTML = '';
+            const filteredTxns = transactionHistory.filter(txn => isDateInActiveRange(txn.date, filters[1]));
+            if(filteredTxns.length === 0) { list.innerHTML = `<p style="text-align:center; color:#94A3B8; font-size:13px; margin-top:20px;">No transactions found for this date range.</p>`; return; }
+            filteredTxns.forEach(txn => {
+                const isPurchase = txn.type === 'purchase';
+                const iconClass = isPurchase ? 'out' : 'in'; 
+                const amountColorClass = isPurchase ? 'out' : 'in'; 
+                const iconSvg = isPurchase 
+                    ? `<svg viewBox="0 0 24 24"><polyline points="20 12 12 20 4 12"></polyline><line x1="12" y1="4" x2="12" y2="20"></line></svg>` 
+                    : `<svg viewBox="0 0 24 24"><polyline points="4 12 12 4 20 12"></polyline><line x1="12" y1="20" x2="12" y2="4"></line></svg>`; 
+                
+                const sign = isPurchase ? '-' : '+';
+                const title = isPurchase ? `Purchase from Locals` : `Dispatch to ${txn.dealer}`;
+                
+                let badgeHtml = '';
+                if(!isPurchase) {
+                    const paid = txn.paidAmount || 0;
+                    if(paid === 0) badgeHtml = `<span class="status-badge badge-due" style="float:right;">DUE</span>`;
+                    else if(paid < txn.total) badgeHtml = `<span class="status-badge badge-partial" style="float:right;">PARTIAL</span>`;
+                }
+                const d = new Date(txn.date);
+                const dd = String(d.getDate()).padStart(2, '0');
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const yyyy = d.getFullYear();
+                const timeStr = d.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit', hour12: true});
+                const dateStr = `${dd}/${mm}/${yyyy} ${timeStr}`;
+                let itemsHtml = '';
+                txn.items.forEach(item => { itemsHtml += `<div class="txn-detail-item"><span>${item.qty} ${item.unit} × ${item.name}</span><span>₹${item.total.toLocaleString('en-IN', {minimumFractionDigits: 2})}</span></div>`; });
+                const card = document.createElement('div'); card.className = 'txn-card';
+                card.innerHTML = `
+                    <div class="txn-card-header" onclick="this.parentElement.classList.toggle('expanded')">
+                        <div class="txn-info-left">
+                            <div class="txn-icon ${iconClass}">${iconSvg}</div>
+                            <div><h4 class="txn-title">${title} ${badgeHtml}</h4><p class="txn-date">${dateStr} &bull; ${txn.invoice}</p></div>
+                        </div>
+                        <div class="txn-amount ${amountColorClass}">${sign}&nbsp;₹${txn.total.toLocaleString('en-IN', {minimumFractionDigits: 2})}</div>
+                    </div>
+                    <div class="txn-details">${itemsHtml}</div>
+                `;
+                list.appendChild(card);
+            });
+        }
+        // ==========================================
+        // PREMIUM DEALERS (ACCOUNTS) MAIN LIST
+        // ==========================================
+        function renderDealers() {
+            const list = document.getElementById('dealer-list-container'); if(!list) return; list.innerHTML = '';
+            
+            const dispatchTxns = transactionHistory.filter(txn => txn.type === 'dispatch' && txn.dealer);
+            
+            let globalTotalDue = 0;
+            let globalTotalPaid = 0;
+            const dealerStats = {};
+            dispatchTxns.forEach(txn => {
+                const name = txn.dealer;
+                if (!dealerStats[name]) dealerStats[name] = { due: 0, paid: 0, total: 0, latestTxnDate: 0 };
+                
+                const txnTime = new Date(txn.date).getTime();
+                if (txnTime > dealerStats[name].latestTxnDate) dealerStats[name].latestTxnDate = txnTime;
+                const paid = txn.paidAmount || 0;
+                dealerStats[name].paid += paid;
+                dealerStats[name].due += (txn.total - paid);
+                dealerStats[name].total += txn.total;
+                globalTotalPaid += paid;
+                globalTotalDue += (txn.total - paid);
+            });
+            document.getElementById('global-total-due').innerText = '₹' + globalTotalDue.toLocaleString('en-IN', {minimumFractionDigits: 2});
+            document.getElementById('global-total-paid').innerText = '₹' + globalTotalPaid.toLocaleString('en-IN', {minimumFractionDigits: 2});
+            const allDealerNames = Object.keys(dealerStats);
+            const dueDealers = allDealerNames.filter(n => dealerStats[n].due > 0);
+            const paidDealers = allDealerNames.filter(n => dealerStats[n].due <= 0 && dealerStats[n].total > 0);
+            document.getElementById('global-due-count').innerText = `${dueDealers.length} Dealers`;
+            document.getElementById('global-paid-count').innerText = `${paidDealers.length} Dealers`;
+            let displayNames = globalDealerTab === 'due' ? dueDealers : paidDealers;
+            const searchVal = document.getElementById('dealer-main-search') ? document.getElementById('dealer-main-search').value.toLowerCase() : '';
+            if (searchVal) {
+                displayNames = displayNames.filter(n => n.toLowerCase().includes(searchVal));
+            }
+            displayNames.sort((a,b) => dealerStats[b].latestTxnDate - dealerStats[a].latestTxnDate);
+            if(displayNames.length === 0) { list.innerHTML = `<p style="text-align:center; color:#94A3B8; font-size:13px; margin-top:20px;">No dealers found in this category.</p>`; return; }
+            displayNames.forEach(name => {
+                const stat = dealerStats[name];
+                let avatarLetter = name.charAt(0).toUpperCase();
+                const d = new Date(stat.latestTxnDate);
+                const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const amtClass = stat.due > 0 ? 'red' : 'green';
+                const amtLabel = stat.due > 0 ? `₹${stat.due.toLocaleString('en-IN', {minimumFractionDigits: 2})}` : `₹${stat.total.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+                const dateLabel = stat.due > 0 ? `Due: ${dateStr}` : `Paid: ${dateStr}`;
+                
+                let actionsHtml = '';
+                if (globalDealerTab === 'due') {
+                    actionsHtml = `
+                    <div class="dealer-card-actions">
+                        <button class="d-action-btn" onclick="openDealerDetail('${name}')">
+                            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                            Send Reminder
+                        </button>
+                        <button class="d-action-btn" onclick="openQuickPayment('${name}', event)">
+                            <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                            Record Payment
+                        </button>
+                    </div>`;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'dealer-card';
+                card.innerHTML = `
+                    <div class="dealer-card-main" onclick="openDealerDetail('${name}')">
+                        <div class="dealer-avatar">${avatarLetter}</div>
+                        <div class="dealer-info-middle">
+                            <h4 class="dealer-name">${name}</h4>
+                            <p class="dealer-id">Total Biz: ₹${stat.total.toLocaleString('en-IN')}</p>
+                        </div>
+                        <div class="dealer-info-right">
+                            <h4 class="dealer-amt ${amtClass}">${amtLabel}</h4>
+                            <p class="dealer-date">${dateLabel}</p>
+                        </div>
+                    </div>
+                    ${actionsHtml}
+                `;
+                list.appendChild(card);
+            });
+        }
+        
+        // QUICK RECORD PAYMENT FROM MAIN TAB
+        function openQuickPayment(dealerName, event) {
+            event.stopPropagation();
+            const dueTxns = transactionHistory.filter(t => t.dealer === dealerName && t.type === 'dispatch' && (t.paidAmount || 0) < t.total);
+            if(dueTxns.length > 0) {
+                // Sort ascending by date to pay oldest due bill first
+                dueTxns.sort((a,b) => new Date(a.date) - new Date(b.date));
+                openMarkPaidModal(dueTxns[0].id, event);
+            } else {
+                showToast("No due payments found for this dealer.");
+            }
+        }
+
+        // ==========================================
+        // PREMIUM DEALER DETAILS
+        // ==========================================
+        function openDealerDetail(dealerName) {
+            currentDealerName = dealerName;
+            currentDealerStatusFilter = 'all';
+            
+            document.querySelectorAll('#screen-dealer-detail .filter-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('#screen-dealer-detail .filter-tab:nth-child(1)').classList.add('active');
+            
+            document.getElementById('dd-title').innerText = dealerName;
+            document.getElementById('dd-header-avatar').innerText = dealerName.charAt(0).toUpperCase();
+            document.getElementById('dd-header-name').innerText = dealerName;
+            renderDealerDetailTransactions();
+            openAppScreen('dealer-detail');
+        }
+        function setDealerStatusFilter(status, element) {
+            currentDealerStatusFilter = status;
+            document.querySelectorAll('#screen-dealer-detail .filter-tab').forEach(t => t.classList.remove('active'));
+            element.classList.add('active');
+            renderDealerDetailTransactions();
+        }
+        let pendingPaidTxnId = null;
+        let pendingRemainingDue = 0;
+        
+        // POPUP LOGIC ADDED HERE
+        function openMarkPaidModal(txnId, e) {
+            e.stopPropagation();
+            pendingPaidTxnId = txnId;
+            const txn = transactionHistory.find(t => t.id === txnId);
+            
+            const paid = txn.paidAmount || 0;
+            pendingRemainingDue = txn.total - paid;
+            
+            document.getElementById('markPaidDetails').innerHTML = `
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                    <span style="color:#64748B; font-weight:500; font-size:13px;">Total Bill</span>
+                    <span style="color:#0A1128; font-weight:700; font-size:14px;">₹${txn.total.toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items: center; background: #FEF2F2; padding: 10px 12px; border-radius: 8px; margin-bottom:12px;">
+                    <span style="color:#EF4444; font-weight:600; font-size:13px;">Remaining Due</span>
+                    <span style="color:#EF4444; font-weight:700; font-size:16px;">₹${pendingRemainingDue.toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
+                </div>
+            `;
+            
+            document.getElementById('payAmountInput').value = pendingRemainingDue.toFixed(2);
+            document.getElementById('partialPaymentSection').style.display = 'none';
+            document.getElementById('savePaymentBtn').style.display = 'none';
+            document.getElementById('markPaidModal').classList.add('show');
+        }
+        
+        function executeFullPayment() {
+            document.getElementById('payAmountInput').value = pendingRemainingDue.toFixed(2);
+            savePartialPayment();
+        }
+        function togglePartialPayment() {
+            document.getElementById('partialPaymentSection').style.display = 'block';
+            document.getElementById('savePaymentBtn').style.display = 'block';
+        }
+        function closePaymentModal() {
+            document.getElementById('markPaidModal').classList.remove('show');
+            document.getElementById('partialPaymentSection').style.display = 'none';
+            document.getElementById('savePaymentBtn').style.display = 'none';
+        }
+
+        function savePartialPayment() {
+            if(pendingPaidTxnId) {
+                const amountInput = parseFloat(document.getElementById('payAmountInput').value);
+                if(!amountInput || amountInput <= 0 || amountInput > pendingRemainingDue) {
+                    showToast("Please enter a valid amount up to the remaining due.", "error");
+                    return;
+                }
+                const index = transactionHistory.findIndex(t => t.id === pendingPaidTxnId);
+                if(index !== -1) {
+                    const currentPaid = transactionHistory[index].paidAmount || 0;
+                    transactionHistory[index].paidAmount = currentPaid + amountInput;
+                    
+                    if (!transactionHistory[index].paymentLog) transactionHistory[index].paymentLog = [];
+                    transactionHistory[index].paymentLog.push({ amount: amountInput, date: new Date().toISOString() });
+                    
+                    localStorage.setItem('sarkar_txns', JSON.stringify(transactionHistory));
+                    showToast("Payment Updated Successfully!");
+                    
+                    if (document.getElementById('screen-dealer-detail').classList.contains('active')) {
+                        renderDealerDetailTransactions();
+                    } else {
+                        renderDealers();
+                        renderHome();
+                    }
+                }
+                pendingPaidTxnId = null;
+            }
+            closePaymentModal();
+        }
+        function renderDealerDetailTransactions() {
+            if (!currentDealerName) return;
+            const list = document.getElementById('dd-txn-list'); list.innerHTML = '';
+            
+            let txns = transactionHistory.filter(txn => txn.dealer === currentDealerName && txn.type === 'dispatch');
+            txns = txns.filter(txn => isDateInActiveRange(txn.date, filters[3]));
+            
+            let totalPaid = 0; let totalDue = 0;
+            txns.forEach(t => {
+                const paid = t.paidAmount || 0;
+                totalPaid += paid;
+                totalDue += (t.total - paid);
+            });
+            document.getElementById('dd-kpi-paid').innerText = `₹${totalPaid.toLocaleString('en-IN')}`;
+            document.getElementById('dd-kpi-due').innerText = `₹${totalDue.toLocaleString('en-IN')}`;
+            if (currentDealerStatusFilter === 'paid') {
+                txns = txns.filter(t => (t.paidAmount || 0) >= t.total);
+            } else if (currentDealerStatusFilter === 'due') {
+                txns = txns.filter(t => (t.paidAmount || 0) < t.total);
+            }
+            if(txns.length === 0) { list.innerHTML = `<p style="text-align:center; color:#94A3B8; font-size:13px; margin-top:20px;">No transactions found.</p>`; return; }
+            txns.forEach(txn => {
+                const paid = txn.paidAmount || 0;
+                const isFullyPaid = paid >= txn.total;
+                const isPartial = paid > 0 && paid < txn.total;
+                
+                const d = new Date(txn.date);
+                const dd = String(d.getDate()).padStart(2, '0');
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const yyyy = d.getFullYear();
+                const timeStr = d.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit', hour12: true});
+                const dateStr = `${dd}/${mm}/${yyyy} ${timeStr}`;
+                let statusText = '';
+                let statusDetail = '';
+                
+                if(isFullyPaid) {
+                    statusText = `<span class="status-badge badge-paid">FULL PAYMENT</span>`;
+                    statusDetail = `<div style="font-size:11px; color:#10B981; font-weight:600; margin-top:2px;">Paid Overall: ₹${paid.toLocaleString('en-IN', {minimumFractionDigits:2})}</div>`;
+                } else if(isPartial) {
+                    statusText = `<span class="status-badge badge-partial">PARTIALLY PAID</span>`;
+                    statusDetail = `<div style="font-size:11px; color:#F59E0B; font-weight:600; margin-top:2px;">Paid: ₹${paid.toLocaleString('en-IN', {minimumFractionDigits:2})} | Due: ₹${(txn.total - paid).toLocaleString('en-IN', {minimumFractionDigits:2})}</div><div style="font-size:10px; color:#64748B;">Latest activity: ${dateStr}</div>`;
+                } else {
+                    statusText = `<span class="status-badge badge-due">DUE</span>`;
+                    statusDetail = `<div style="font-size:11px; color:#EF4444; font-weight:600; margin-top:2px;">Due: ₹${txn.total.toLocaleString('en-IN', {minimumFractionDigits:2})}</div><div style="font-size:10px; color:#64748B;">Generated: ${dateStr}</div>`;
+                }
+
+                let paymentLogHtml = '';
+                if (txn.paymentLog && txn.paymentLog.length > 0) {
+                    paymentLogHtml = `<div style="margin-top: 10px; border-top: 1px dashed #E2E8F0; padding-top: 10px; padding-bottom: 10px; border-bottom: 1px dashed #E2E8F0;">
+                        <div style="font-size: 11px; color: #64748B; font-weight: 700; margin-bottom: 6px; text-transform: uppercase;">Payment History</div>
+                        ${txn.paymentLog.map(p => {
+                            const pd = new Date(p.date);
+                            return `<div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px; align-items:center;">
+                                <span style="color:#475569;">${String(pd.getDate()).padStart(2,'0')}/${String(pd.getMonth()+1).padStart(2,'0')}/${pd.getFullYear()} ${pd.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', hour12:true})}</span>
+                                <span style="color:#10B981; font-weight:700;">+ ₹${p.amount.toLocaleString('en-IN', {minimumFractionDigits:2})}</span>
+                            </div>`;
+                        }).join('')}
+                    </div>`;
+                }
+
+                let itemsHtml = '';
+                txn.items.forEach(item => { itemsHtml += `<div class="txn-detail-item"><span>${item.qty} ${item.unit} × ${item.name}</span><span>₹${item.total.toLocaleString('en-IN', {minimumFractionDigits: 2})}</span></div>`; });
+                const card = document.createElement('div'); card.className = 'txn-card';
+                card.innerHTML = `
+                    <div class="txn-card-header" onclick="this.parentElement.classList.toggle('expanded')">
+                        <div style="flex:1;">
+                            <h4 class="txn-title" style="font-size:15px; margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
+                                <span>₹${txn.total.toLocaleString('en-IN', {minimumFractionDigits: 2})}</span>
+                                ${statusText}
+                            </h4>
+                            ${statusDetail}
+                            <p class="txn-date" style="margin-top:6px;">Invoice: ${txn.invoice} &bull; Tap to view history</p>
+                            ${!isFullyPaid 
+                                ? `<button class="btn-mark-paid" onclick="openMarkPaidModal(${txn.id}, event)">Update Payment</button>` 
+                                : ``
+                            }
+                        </div>
+                    </div>
+                    <div class="txn-details">
+                        ${paymentLogHtml}
+                        <div style="font-size: 11px; color: #64748B; font-weight: 700; margin-bottom: 6px; margin-top:10px; text-transform: uppercase;">Items Ordered</div>
+                        ${itemsHtml}
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+        // ==========================================
+        // INVOICE LOGIC
+        // ==========================================
+        function generateInvoice() {
+            if (carts.dispatch.length === 0) { showToast("Please add items to dispatch first.", "error"); return; }
+            const dealerNameInput = document.getElementById('d-dealer-name');
+            const dealerName = dealerNameInput.value.trim();
+            if (!dealerName) { showToast("Please enter the Dealer Name to generate the bill.", "error"); dealerNameInput.focus(); return; }
+            const slipInput = document.getElementById('d-slip-upload'); const slipContainer = document.getElementById('inv-slip-container'); const slipImg = document.getElementById('inv-slip-img');
+            if (slipInput.files && slipInput.files[0]) {
+                const reader = new FileReader(); reader.onload = function(e) { slipImg.src = e.target.result; slipContainer.style.display = 'block'; }; reader.readAsDataURL(slipInput.files[0]);
+            } else { slipContainer.style.display = 'none'; slipImg.src = ''; }
+            
+            const tbody = document.getElementById('inv-table-body'); let total = 0;
+            currentInvoiceId = 'INV-' + Math.floor(100000 + Math.random() * 900000);
+            
+            const todayDate = new Date();
+            const todayStr = `${String(todayDate.getDate()).padStart(2, '0')}/${String(todayDate.getMonth()+1).padStart(2, '0')}/${todayDate.getFullYear()}`;
+            
+            document.getElementById('inv-date').innerText = todayStr;
+            document.getElementById('inv-invoice-num').innerText = currentInvoiceId; document.getElementById('inv-dealer-name').innerText = dealerName;
+            tbody.innerHTML = '';
+            carts.dispatch.forEach((item) => {
+                total += item.total; const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${item.qty}</td><td>${item.name}</td><td>${item.unit}</td><td class="text-right">${item.appliedRate.toFixed(2)}</td><td class="text-right">${item.total.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits:2})}</td>`;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('inv-grand-total').innerText = `TOTAL: ₹${total.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits:2})}`;
+            document.getElementById('invoiceOverlay').classList.add('show');
+        }
+        function printInvoice() {
+            const dealerName = document.getElementById('inv-dealer-name').innerText; const invNum = document.getElementById('inv-invoice-num').innerText;
+            const originalTitle = document.title; document.title = `${dealerName} - ${invNum}`;
+            window.print(); document.title = originalTitle;
+        }
+        function closeInvoice() { document.getElementById('invoiceOverlay').classList.remove('show'); executeAction('dispatch'); }
+        // ==========================================
+        // ANALYSIS SECTION
+        // ==========================================
+        function fuzzyMatch(query, text) {
+            const q = query.toLowerCase().replace(/[^a-z0-9]/g, ''); const t = text.toLowerCase().replace(/[^a-z0-9]/g, '');
+            if(!q) return true; let qIdx = 0;
+            for(let i = 0; i < t.length; i++) { if(t[i] === q[qIdx]) qIdx++; if(qIdx === q.length) return true; } return false;
+        }
+        function renderAnalysisItems(query = "") {
+            const container = document.getElementById('analysis-list-container'); if(!container) return; container.innerHTML = '';
+            const terms = query.toLowerCase().split(' ').filter(t => t);
+            const results = scrapDatabase.filter(item => { const name = item.name.toLowerCase(); return terms.every(term => name.includes(term)) || fuzzyMatch(query, name); });
+            if(results.length === 0) { container.innerHTML = `<p style="text-align:center; color:#94A3B8; font-size:13px;">No materials found.</p>`; return; }
+            // Smart Sort by Recent Activity
+            const itemLatestTxn = {};
+            transactionHistory.forEach(txn => {
+                txn.items.forEach(i => {
+                    const tDate = new Date(txn.date);
+                    if(!itemLatestTxn[i.baseId] || tDate > itemLatestTxn[i.baseId]) {
+                        itemLatestTxn[i.baseId] = tDate;
+                    }
+                });
+            });
+            results.sort((a, b) => {
+                const dateA = itemLatestTxn[a.id] ? itemLatestTxn[a.id].getTime() : 0;
+                const dateB = itemLatestTxn[b.id] ? itemLatestTxn[b.id].getTime() : 0;
+                return dateB - dateA;
+            });
+            results.forEach(item => {
+                const card = document.createElement('div'); card.className = 'analysis-card';
+                card.innerHTML = `
+                    <div class="item-info-left" onclick="openItemAnalysis(${item.id})" style="flex:1;">
+                        <div class="item-icon-box icon-${item.type}">${icons[item.type]}</div>
+                        <div><div class="item-name">${item.name} ${item.temp ? '<span style="font-size:10px; background:#FEF2F2; color:#EF4444; padding:2px 6px; border-radius:4px; margin-left:4px;">Temp</span>' : ''}</div><div class="item-meta">Default: ₹${item.rate} / ${item.unit}</div></div>
+                    </div>
+                    <div class="analysis-card-right" style="display:flex; align-items:center; gap: 12px;">
+                        <div onclick="editMaterial(${item.id}); event.stopPropagation();" style="padding: 6px; background: #EFF6FF; border-radius: 8px; color: #3B82F6; border: 1px solid #BFDBFE;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </div>
+                        <svg viewBox="0 0 24 24" onclick="openItemAnalysis(${item.id})"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+        const aSearchInput = document.getElementById('a-search');
+        aSearchInput.addEventListener('focus', () => {
+            if(!document.body.classList.contains('search-active')) {
+                window.history.pushState({ searchActive: true, tab: 'analysis' }, '');
+                document.body.classList.add('search-active');
+            }
+        });
+        aSearchInput.addEventListener('keyup', (e) => renderAnalysisItems(e.target.value));
+        aSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.target.blur(); });
+        function closeAnalysisSearch() { 
+            if(document.body.classList.contains('search-active')) window.history.back(); 
+        }
+        function editMaterial(id) {
+            const item = scrapDatabase.find(i => i.id === id);
+            if(item) {
+                document.getElementById('new-item-name').value = item.name; document.getElementById('new-item-rate').value = item.rate;
+                document.getElementById('new-item-unit').value = item.unit; document.getElementById('new-item-type').value = item.type;
+                document.getElementById('new-item-permanent').checked = !item.temp; openAppScreen('add-item');
+            }
+        }
+        function saveNewMaterial() {
+            const name = document.getElementById('new-item-name').value.trim(); const rate = parseFloat(document.getElementById('new-item-rate').value);
+            const unit = document.getElementById('new-item-unit').value; const type = document.getElementById('new-item-type').value;
+            const isPermanent = document.getElementById('new-item-permanent').checked;
+            if(!name || !rate || rate <= 0) { showToast("Please provide a valid material name and rate.", "error"); return; }
+            const existingIndex = scrapDatabase.findIndex(i => i.name.toLowerCase() === name.toLowerCase());
+            if(existingIndex >= 0) {
+                scrapDatabase[existingIndex].rate = rate; scrapDatabase[existingIndex].unit = unit; scrapDatabase[existingIndex].type = type; scrapDatabase[existingIndex].temp = !isPermanent;
+                showToast("Material updated successfully!");
+            } else {
+                scrapDatabase.push({ id: Date.now(), name: name, unit: unit, rate: rate, type: type, temp: !isPermanent });
+                showToast("New material added successfully!");
+            }
+            localStorage.setItem('sarkar_scrap_db', JSON.stringify(scrapDatabase)); renderAnalysisItems();
+            
+            let addedItem = scrapDatabase.find(i => i.name.toLowerCase() === name.toLowerCase());
+            let targetSource = pendingAutoSelectSource;
+            window.history.back();
+            if (targetSource) setTimeout(() => selectItem(targetSource, addedItem), 150); 
+            else renderHome();
+        }
+        function openItemAnalysis(itemId) { currentAnalysisItemId = itemId; renderItemAnalysis(itemId); openAppScreen('item-analysis'); }
+        function renderItemAnalysis(itemId) {
+            const item = scrapDatabase.find(i => i.id === itemId); if(!item) return;
+            document.getElementById('ia-title').innerText = item.name;
+            
+            let totalBoughtQty = 0; let totalBoughtAmt = 0; let totalSoldQty = 0; let totalSoldAmt = 0;
+            const historyList = document.getElementById('ia-history-list'); historyList.innerHTML = '';
+            const filteredTxns = transactionHistory.filter(txn => isDateInActiveRange(txn.date, filters[2]));
+            let itemHasTxns = false;
+            filteredTxns.forEach(txn => {
+                const itemInTxn = txn.items.find(i => i.baseId === itemId || i.name === item.name);
+                if(itemInTxn) {
+                    itemHasTxns = true;
+                    if(txn.type === 'purchase') { totalBoughtQty += itemInTxn.qty; totalBoughtAmt += itemInTxn.total; } 
+                    else { totalSoldQty += itemInTxn.qty; totalSoldAmt += itemInTxn.total; }
+                    const isPurchase = txn.type === 'purchase'; const amountColorClass = isPurchase ? 'out' : 'in'; const sign = isPurchase ? '-' : '+';
+                    const title = isPurchase ? `Purchased` : `Dispatched`;
+                    
+                    const d = new Date(txn.date); const dd = String(d.getDate()).padStart(2, '0'); const mm = String(d.getMonth() + 1).padStart(2, '0');
+                    const yyyy = d.getFullYear(); const timeStr = d.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit', hour12: true});
+                    const dateStr = `${dd}/${mm}/${yyyy} ${timeStr}`;
+                    const div = document.createElement('div'); div.className = 'cart-item';
+                    div.innerHTML = `
+                        <div class="cart-item-details"><h4 class="cart-item-name" style="color: ${isPurchase ? '#EF4444' : '#10B981'}">${title}</h4><p class="cart-item-calc">${itemInTxn.qty} ${itemInTxn.unit} at ₹${itemInTxn.appliedRate} • ${dateStr}</p></div>
+                        <div class="cart-item-right"><span class="cart-item-total ${amountColorClass}">${sign}₹${itemInTxn.total.toLocaleString('en-IN', {minimumFractionDigits: 2})}</span></div>
+                    `;
+                    historyList.appendChild(div);
+                }
+            });
+            if(!itemHasTxns) historyList.innerHTML = `<p style="text-align:center; color:#94A3B8; font-size:13px;">No data for selected time range.</p>`;
+            const currentStock = getItemStock(itemId);
+            document.getElementById('ia-current-stock-val').innerText = `${currentStock} ${item.unit}`;
+            document.getElementById('ia-bought-qty').innerText = `${totalBoughtQty} ${item.unit}`;
+            document.getElementById('ia-bought-amt').innerText = `₹${totalBoughtAmt.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('ia-sold-qty').innerText = `${totalSoldQty} ${item.unit}`;
+            document.getElementById('ia-sold-amt').innerText = `₹${totalSoldAmt.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+        }
+        
+        // =======================================================
+        // PULL TO REFRESH LOGIC
+        // =======================================================
+        const dWrapper = document.getElementById('dashWrapper');
+        const ptrLoader = document.getElementById('ptrLoader');
+        let pStartY = 0; let pCurrentY = 0; let isPulling = false;
+        dWrapper.addEventListener('touchstart', e => { if (dWrapper.scrollTop === 0) { pStartY = e.touches[0].screenY; isPulling = true; ptrLoader.classList.add('dragging'); } }, {passive: true});
+        dWrapper.addEventListener('touchmove', e => {
+            if (!isPulling) return;
+            if (dWrapper.scrollTop === 0 && pStartY > 0) {
+                pCurrentY = e.touches[0].screenY; const pullDistance = pCurrentY - pStartY;
+                if (pullDistance > 0) {
+                    const activeSec = document.querySelector('.view-section.active').id;
+                    if (activeSec === 'section-home' || activeSec === 'section-transaction' || activeSec === 'section-dealers') {
+                        ptrLoader.style.height = Math.min(pullDistance / 2.5, 60) + 'px';
+                        if (pullDistance > 100) ptrLoader.classList.add('ready'); else ptrLoader.classList.remove('ready');
+                    }
+                }
+            }
+        }, {passive: true});
+        dWrapper.addEventListener('touchend', e => {
+            if (!isPulling) return;
+            isPulling = false; ptrLoader.classList.remove('dragging');
+            if (ptrLoader.style.height !== '0px' && ptrLoader.style.height !== '') {
+                if (ptrLoader.classList.contains('ready')) {
+                    ptrLoader.style.height = '50px'; ptrLoader.classList.add('refreshing');
+                    setTimeout(() => { forceRecount(); changeGreeting(); refreshCurrentView(); ptrLoader.style.height = '0px'; ptrLoader.classList.remove('ready', 'refreshing'); }, 1000); 
+                } else ptrLoader.style.height = '0px';
+            }
+            pStartY = 0;
+        });
+        // Initial Mount
+        if (document.getElementById('section-transaction').classList.contains('active')) renderTransactions();
+        renderHome(); 
+    </script>
+</body>
+</html>
